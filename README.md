@@ -1,4 +1,4 @@
-# Lottery - full stack dapp
+# Web3 Jobs dapp
 
 ## Start with
 ```bash
