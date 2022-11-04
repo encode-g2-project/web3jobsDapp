@@ -3,19 +3,25 @@ import Head from "next/head";
 import { useEffect, useState } from "react";
 import { Container, Row, Card, Button } from "react-bootstrap";
 import { container } from "tsyringe";
+import ApplicantView from "../components/applicantView";
 import OwnerView from "../components/ownerView";
-import PlayerView from "../components/playerView";
-import { LotteryService } from "../services/LotteryService";
+import RecruiterView from "../components/recruiterView";
+import UnregisteredView from "../components/unregisteredView";
+import { JobApplicationService } from "../services/JobApplicationService";
+import { JobPostService } from "../services/JobPostService";
 
 export default function Home() {
 
   //get the service instance
-  const lotteryServiceInstance = container.resolve(LotteryService);
+  const jobApplicationServiceInstance = container.resolve(JobApplicationService);
+  const jobPostServiceInstance = container.resolve(JobPostService);
   const [isConnected, setIsConnected] = useState(false);
   const [signer, setSigner] = useState(undefined);
   const [provider, setProvider] = useState(undefined);
   const [isSupportedNetwork, setIsSupportedNetwork] = useState(true);
   const [isOwner, setIsOwner] = useState(false);
+  const [isRecruiter, setIsRecruiter] = useState(false);
+  const [isApplicant, setIsApplicant] = useState(false);
   const [hasMetaMask, setHasMetaMask]= useState(true);
 
 
@@ -51,7 +57,8 @@ export default function Home() {
           setIsConnected(true);
           setProvider(provider);
           setSigner(provider.getSigner());
-          setIsOwner(await lotteryServiceInstance.isOwner(provider.getSigner()));
+          // TODO logic to identify the role of the user
+          // setIsOwner(await jobApplicationServiceInstance.isOwner(provider.getSigner()));
         }
 
         ethereum.on('accountsChanged', onaAccountsChanged);
@@ -77,19 +84,21 @@ export default function Home() {
   return (
     <Container className="md-container">
       <Head>
-        <title>Lottery Dapp</title>
+        <title>Web3 Jobs</title>
         <link rel="icon" href="/favicon-32x32.png" />
       </Head>
       <Container>
         <h1>
-          Welcome to <a href="#"> awesome lottery</a>
+          Welcome to <a href="#"> Web3 Jobs</a>
         </h1>
         {isConnected && <>
-          {isOwner && isSupportedNetwork ? <OwnerView signer={signer} lotteryService={lotteryServiceInstance} /> :
-            isSupportedNetwork && <PlayerView signer={signer} lotteryService={lotteryServiceInstance} />}
+          {isOwner && isSupportedNetwork ? <OwnerView signer={signer} jobApplicationServiceInstance={jobApplicationServiceInstance} jobPostServiceInstance={jobPostServiceInstance} /> :
+            isRecruiter && isSupportedNetwork ? <RecruiterView signer={signer} jobApplicationServiceInstance={jobApplicationServiceInstance} jobPostServiceInstance={jobPostServiceInstance} /> :
+            isApplicant && isSupportedNetwork ? <ApplicantView signer={signer} jobApplicationServiceInstance={jobApplicationServiceInstance} jobPostServiceInstance={jobPostServiceInstance} /> :
+            isSupportedNetwork && <UnregisteredView signer={signer} jobApplicationServiceInstance={jobApplicationServiceInstance} jobPostServiceInstance={jobPostServiceInstance} />}
         </>}
         {!hasMetaMask && <div className="alert alert-danger" role="alert"> You need Metamask to use this app.</div>}
-        {!isSupportedNetwork && <div className="alert alert-danger" role="alert"> Awesome lottery is currently in beta. Only available on Goerli Tesnet. Change your metamask network!</div>}
+        {!isSupportedNetwork && <div className="alert alert-danger" role="alert"> Web3 jobs is currently in beta. Only available on Goerli Tesnet. Change your metamask network!</div>}
       </Container>
       <footer className="cntr-footer">
         <a

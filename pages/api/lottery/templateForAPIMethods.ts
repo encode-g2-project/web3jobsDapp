@@ -1,7 +1,7 @@
 import Cors from "cors";
 import {container} from "tsyringe";
-import { ILotteryService } from "../../../services/ILotteryService";
-import { LotteryService } from "../../../services/LotteryService";
+import { JobPostService } from "../../../services/JobPostService";
+import { IJobPostService } from "../../../services/IJobPostService";
 
 // Initializing the cors middleware
 const cors = Cors({
@@ -32,7 +32,7 @@ async function handler(req, res) {
     const {var1, var2} = req.body;
 
     //get the service instance
-    const instance = container.resolve(LotteryService) as ILotteryService;
+    const instance = container.resolve(JobPostService) as IJobPostService;
     //do something
     // for example: return res.status(201).json(await instance.doSomething(var1, var2, ...));
 
