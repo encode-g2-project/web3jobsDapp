@@ -14,12 +14,14 @@ export class JobPostService implements IJobPostService {
 
   constructor() {
     this.provider = ethers.getDefaultProvider("goerli");
-   
+
     this.jobsContract = new ethers.Contract(
       CONTRACT_ADDRESS,
       CONTRACT_ABI,
       this.provider
     );
   }
-
+  async postJob() {}
+  async getMyJobs() {}
+  async unpublishJob() {}
 }
