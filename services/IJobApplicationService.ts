@@ -16,6 +16,7 @@ export interface ChangeApplicationStatus {
 
 export interface IJobApplicationService {
   newApplication: (signer: ethers.Signer, jobId: string) => void;
+  getMyApplications: (signer: ethers.Signer) => void;
 
   getMyApplicants: (jobId: string) => void;
 
