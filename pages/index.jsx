@@ -22,6 +22,10 @@ export default function Home() {
   const [isRecruiter, setIsRecruiter] = useState(false);
   const [isApplicant, setIsApplicant] = useState(false);
   const [hasMetaMask, setHasMetaMask] = useState(true);
+  const [selectedOption, setSelectedOption] = useState({
+    view: "apply",
+    option: "search"
+  });
 
   const onChainChanged = (chainId) => {
     // Handle the new chain.
@@ -80,6 +84,10 @@ export default function Home() {
 
   }, []);
 
+  const onChangeOption = (view, option) => {
+    setSelectedOption({ view, option });
+  }
+
   return (
     <>
       <Head>
@@ -87,12 +95,14 @@ export default function Home() {
         <link rel="icon" href="/favicon-32x32.png" />
       </Head>
       <>
-        <Header />
+        <Header onChangeOption={onChangeOption} />
         <main className="pt-20">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             {/* We've used 3xl here, but feel free to try other max-widths based on your needs */}
             <div className="mx-auto max-w-4xl">
-              {isConnected && <ApplicantView signer={signer} jobApplicationServiceInstance={jobApplicationServiceInstance} jobPostServiceInstance={jobPostServiceInstance} />}
+              {isConnected && selectedOption.view === "apply" ?
+                <ApplicantView onChangeOption={onChangeOption} searchOptionSelected={selectedOption.option === 'search'} signer={signer} jobApplicationServiceInstance={jobApplicationServiceInstance} jobPostServiceInstance={jobPostServiceInstance} /> :
+                <RecruiterView onChangeOption={onChangeOption} jobPostingsOptionSelected={selectedOption.option === 'jobPostings'} signer={signer} jobApplicationServiceInstance={jobApplicationServiceInstance} jobPostServiceInstance={jobPostServiceInstance} />}
               {!hasMetaMask && <div className="alert alert-danger" role="alert"> You need Metamask to use this app.</div>}
               {!isSupportedNetwork && <div className="alert alert-danger" role="alert"> Web3 jobs is currently in beta. Only available on Goerli Tesnet. Change your metamask network!</div>}
             </div>
