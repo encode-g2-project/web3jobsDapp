@@ -60,4 +60,9 @@ export class JobApplicationService implements IJobApplicationService {
     const receipt = await tx.wait();
     return receipt;
   }
+  async getMyApplications(signer: ethers.Signer) {
+    const signedContract = this.jobsContract.connect(signer);
+    const value = await signedContract.getMyApplications();
+    return value;
+  }
 }

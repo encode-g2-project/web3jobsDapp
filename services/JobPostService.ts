@@ -49,4 +49,9 @@ export class JobPostService implements IJobPostService {
     const receipt = await tx.wait();
     return receipt;
   }
+  async getMyJobs(signer: ethers.Signer) {
+    const signedContract = this.jobsContract.connect(signer);
+    const value = await signedContract.getMyJobs();
+    return value;
+  }
 }
