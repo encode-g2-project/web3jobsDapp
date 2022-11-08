@@ -1,8 +1,12 @@
 import { ethers } from "ethers";
+export interface PublishJobPayload {
+  jobId: string;
+  bountyAmount: number;
+  token: string;
+}
 
 export interface IJobPostService {
-  isOwner(signer: ethers.Signer): Promise<boolean>;
-  postJob: () => void;
-  getMyJobs: () => void;
-  unpublishJob: () => void;
+  publishJob: (signer: ethers.Signer, payload: PublishJobPayload) => void;
+  unpublishJob: (signer: ethers.Signer, jobId: string) => void;
+  closeJobOffer: (signer: ethers.Signer, jobId: string) => void;
 }

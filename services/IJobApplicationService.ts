@@ -1,28 +1,27 @@
 import { ethers } from "ethers";
 
+export enum ApplicationStatus {
+  SCREENING,
+  FIRST_INTERVIEW,
+  TECHNICAL_TEST,
+  FINAL_INTERVIEW,
+  HIRED,
+  REJECTED,
+}
 export interface ChangeApplicationStatus {
   applicantAddress: string;
   jobId: string;
   status: ApplicationStatus;
 }
 
-export const ApplicationStatuses = [
-  "screening",
-  "firstInterview",
-  "technicalTest",
-  "finalInterview",
-  "hired",
-  "rejected",
-] as const;
-
-export type ApplicationStatus = typeof ApplicationStatuses[number];
-
 export interface IJobApplicationService {
-  newApplication: () => void;
-  getMyApplications: () => void;
+  newApplication: (signer: ethers.Signer, jobId: string) => void;
 
   getMyApplicants: (jobId: string) => void;
 
-  claimBounty: (jobId: string) => void;
-  changeApplicationStatus: (payload: ChangeApplicationStatus) => void;
+  claimBounty: (signer: ethers.Signer, jobId: string) => void;
+  changeApplicationStatus: (
+    signer: ethers.Signer,
+    payload: ChangeApplicationStatus
+  ) => void;
 }

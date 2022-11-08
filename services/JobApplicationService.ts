@@ -4,9 +4,10 @@ import {
   IJobApplicationService,
 } from "./IJobApplicationService";
 import { injectable } from "tsyringe";
+import web3JobsJson from "../assets/web3Jobs.json";
 
-const CONTRACT_ADDRESS = ""; // Jobs contract
-const CONTRACT_ABI = []; // Jobs contract ABI
+const CONTRACT_ADDRESS = "0x145356Af39a75d9c11bB19e834cbA6084f7887b7"; // Jobs contract
+const CONTRACT_ABI = web3JobsJson.abi; // Jobs contract ABI
 
 @injectable()
 export class JobApplicationService implements IJobApplicationService {
@@ -24,12 +25,39 @@ export class JobApplicationService implements IJobApplicationService {
       this.provider
     );
   }
-  async newApplication() {
-    const tx = await this.jobsContract.submit();
+  async newApplication(signer: ethers.Signer, jobId: string) {
+    const signedContract = this.jobsContract.connect(signer);
+    const tx = await signedContract.newApplication(
+      ethers.utils.formatBytes32String(jobId)
+    );
     const receipt = await tx.wait();
+    return receipt;
   }
-  async getMyApplications() {}
-  async getMyApplicants(jobId: string) {}
-  async claimBounty(jobId: string) {}
-  async changeApplicationStatus(payload: ChangeApplicationStatus) {}
+  async getMyApplicants(jobId: string) {
+    const result = await this.jobsContract.getMyApplicants(
+      ethers.utils.formatBytes32String(jobId)
+    );
+    return result;
+  }
+  async claimBounty(signer: ethers.Signer, jobId: string) {
+    const signedContract = this.jobsContract.connect(signer);
+    const tx = await signedContract.claimBounty(
+      ethers.utils.formatBytes32String(jobId)
+    );
+    const receipt = await tx.wait();
+    return receipt;
+  }
+  async changeApplicationStatus(
+    signer: ethers.Signer,
+    payload: ChangeApplicationStatus
+  ) {
+    const signedContract = this.jobsContract.connect(signer);
+    const tx = await signedContract.changeApplicationStatus(
+      payload.applicantAddress,
+      ethers.utils.formatBytes32String(payload.jobId),
+      payload.status
+    );
+    const receipt = await tx.wait();
+    return receipt;
+  }
 }
