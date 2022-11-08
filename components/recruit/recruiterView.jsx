@@ -31,7 +31,7 @@ export default function RecruiterView({ signer, jobApplicationServiceInstance, j
                 <h1 className="text-3xl font-bold leading-tight tracking-tight text-gray-900 pb-3 pl-3"> {jobPostingsOptionSelected ? "Job Postings" : "My Applicant Pool"}</h1>
             </div>
             <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-                <a class="whitespace-nowrap text-sm text-indigo-600 hover:text-indigo-700 pr-4" href="#" onClick={toggleOption}> {jobPostingsOptionSelected ? "My Applicant Pool" : "Job Postings"}</a>
+                <a className="whitespace-nowrap text-sm text-indigo-600 hover:text-indigo-700 pr-4" href="#" onClick={toggleOption}> {jobPostingsOptionSelected ? "My Applicant Pool" : "Job Postings"}</a>
             </div>
         </div>
         <div className="h-96 rounded-lg border-2 border-gray-200" >
