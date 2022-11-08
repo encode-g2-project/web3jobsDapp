@@ -21,6 +21,12 @@ export class JobPostService implements IJobPostService {
       this.provider
     );
   }
+
+  async isOwner(signer: ethers.Signer) {
+    const owner = await this.jobsContract.connect(signer).owner();
+    return owner === (await signer.getAddress());
+  }
+
   async postJob() {}
   async getMyJobs() {}
   async unpublishJob() {}
