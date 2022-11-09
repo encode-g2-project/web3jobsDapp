@@ -25,4 +25,9 @@ export interface IJobApplicationService {
     signer: ethers.Signer,
     payload: ChangeApplicationStatus
   ) => void;
+  getApplicants: (
+    applicantAddress: string,
+    jobId: string,
+    index: number
+  ) => void;
 }
