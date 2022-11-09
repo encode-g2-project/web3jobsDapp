@@ -2,8 +2,6 @@
 import { PrivateKey } from "@textile/hub";
 import { Client, Identity, KeyInfo, ThreadID, Where } from "@textile/hub";
 import { injectable } from "tsyringe";
-import { isTypedArray } from "util/types";
-import web3JobsthreadId from "../assets/web3jobsDatabaseThread.json";
 
 @injectable()
 export class TextilHelper {

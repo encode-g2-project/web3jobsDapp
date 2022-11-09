@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import Moment from 'react-moment';
 import NewJobPost from './newJobPost';
 import { container } from "tsyringe";
-import { TextilHelper } from "../../util/textilHelper";
+import { TextilHelper } from "../../util/TextilHelper";
 
 function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
