@@ -32,16 +32,12 @@ export class JobApplicationService implements IJobApplicationService {
     return receipt;
   }
   async getMyApplicants(jobId: string) {
-    const result = await this.jobsContract.getMyApplicants(
-      ethers.utils.formatBytes32String(jobId)
-    );
+    const result = await this.jobsContract.getMyApplicants(jobId);
     return result;
   }
   async claimBounty(signer: ethers.Signer, jobId: string) {
     const signedContract = this.jobsContract.connect(signer);
-    const tx = await signedContract.claimBounty(
-      ethers.utils.formatBytes32String(jobId)
-    );
+    const tx = await signedContract.claimBounty(jobId);
     const receipt = await tx.wait();
     return receipt;
   }
@@ -70,5 +66,15 @@ export class JobApplicationService implements IJobApplicationService {
       index
     );
     return value;
+  }
+  async canClaimBounty(
+    applicantAddress: string,
+    jobId: string
+  ): Promise<boolean> {
+    const value = await this.jobsContract.canClaimBounty(
+      applicantAddress,
+      jobId
+    );
+    return Boolean(value);
   }
 }

@@ -19,7 +19,7 @@ export interface IJobApplicationService {
   getMyApplications: (signer: ethers.Signer) => void;
 
   getMyApplicants: (jobId: string) => void;
-
+  canClaimBounty: (applicantAddress: string, jobId: string) => Promise<boolean>;
   claimBounty: (signer: ethers.Signer, jobId: string) => void;
   changeApplicationStatus: (
     signer: ethers.Signer,
