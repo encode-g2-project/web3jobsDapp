@@ -109,7 +109,7 @@ export default function MyApplicantPool({ signer }) {
                         </thead>
                         <tbody>
                             {applicants.map((applicant, applicantIdx) => (
-                                <tr key={applicant.id}>
+                                <tr key={applicant._id}>
                                     <td
                                         className={classNames(
                                             applicantIdx === 0 ? '' : 'border-t border-transparent',

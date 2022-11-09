@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { container } from "tsyringe";
 import ApplicantView from "../components/apply/applicantView";
 import Header from "../components/header";
-import OwnerView from "../components/ownerView";
 import RecruiterView from "../components/recruit/recruiterView";
 import { JobApplicationService } from "../services/JobApplicationService";
 import { JobPostService } from "../services/JobPostService";
@@ -59,8 +58,6 @@ export default function Home() {
           setIsConnected(true);
           setProvider(provider);
           setSigner(provider.getSigner());
-          // TODO logic to identify the role of the user
-          // setIsOwner(await jobApplicationServiceInstance.isOwner(provider.getSigner()));
         }
 
         ethereum.on('accountsChanged', onaAccountsChanged);

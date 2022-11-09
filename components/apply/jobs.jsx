@@ -91,7 +91,7 @@ export default function Jobs({ signer }) {
                     </thead>
                     <tbody>
                         {publishedJobs.map((jobPosition, jobIdx) => (
-                            <tr key={jobPosition.id}>
+                            <tr key={jobPosition._id}>
                                 <td
                                     className={classNames(
                                         jobIdx === 0 ? '' : 'border-t border-transparent',

@@ -74,7 +74,7 @@ export default function MyApplications({ signer }) {
                         </thead>
                         <tbody>
                             {myApplications.map((application, applicationIdx) => (
-                                <tr key={application.id}>
+                                <tr key={application._id}>
                                     <td
                                         className={classNames(
                                             applicationIdx === 0 ? '' : 'border-t border-transparent',

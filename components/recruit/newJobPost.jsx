@@ -5,7 +5,6 @@ export default function NewJobPost({ onCancel, onSave, signer }) {
 
     const [processing, setProcessing] = useState(false);
 
-
     const confirmNewJobPost = async (event) => {
         event.preventDefault();
         const newJobPost = {
@@ -14,10 +13,10 @@ export default function NewJobPost({ onCancel, onSave, signer }) {
             description: event.target.jobDescription.value,
             company: event.target.company.value,
             location: event.target.location.value,
-            bountyAmount: event.target.bounty.value,
+            bountyAmount: parseFloat(event.target.bounty.value),
             salaryRange: event.target.salary.value,
-            createdAt: new Date(),
-            positionsToFill: event.target.positionsToFill.value,
+            createdAt: new Date().toISOString(),
+            positionsToFill: parseInt(event.target.positionsToFill.value),
             recruiterAddress: await signer.getAddress(),
         };
         setProcessing(true);

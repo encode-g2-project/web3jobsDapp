@@ -1,46 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Moment from 'react-moment';
 import NewJobPost from './newJobPost';
-
-const jobPostings = [
-    {
-        _id: 1,
-        title: 'Frontend Developer',
-        description: 'We are looking for a Frontend Developer to join our team. You will be responsible for building the ‘client-side’ of our web applications. You should be able to translate our company and customer needs into functional and appealing interactive applications. If you’re also familiar with Agile methodologies and are passionate about the possibilities that the Web holds, we’d like to meet you. Ultimately, you will work with our team to create a unique user experience through our web applications.',
-        company: 'Aave',
-        publishedId: 'XXX123456',
-        createdAt: new Date(),
-        publishedAt: new Date(),
-        recruiterAddress: '0x123',
-        positionsToFill: 3,
-        bountyAmount: 10000
-    },
-    {
-        _id: 2,
-        title: 'Software Engineer',
-        description: 'We are looking for a Frontend Developer to join our team. You will be responsible for building the ‘client-side’ of our web applications. You should be able to translate our company and customer needs into functional and appealing interactive applications. If you’re also familiar with Agile methodologies and are passionate about the possibilities that the Web holds, we’d like to meet you. Ultimately, you will work with our team to create a unique user experience through our web applications.',
-        company: 'Encode Club',
-        publishedId: 'XXX12345d',
-        createdAt: new Date(),
-        publishedAt: new Date(),
-        recruiterAddress: '0x124',
-        positionsToFill: 5,
-        bountyAmount: 5000
-    },
-    {
-        _id: 3,
-        title: 'Project Manager',
-        description: 'We are looking for a Frontend Developer to join our team. You will be responsible for building the ‘client-side’ of our web applications. You should be able to translate our company and customer needs into functional and appealing interactive applications. If you’re also familiar with Agile methodologies and are passionate about the possibilities that the Web holds, we’d like to meet you. Ultimately, you will work with our team to create a unique user experience through our web applications.',
-        company: 'Miro',
-        publishedId: 'YYY12345d',
-        createdAt: new Date(),
-        publishedAt: new Date(),
-        recruiterAddress: '0x125',
-        positionsToFill: 1,
-        bountyAmount: 5000
-    },
-    // More plans...
-]
+import { container } from "tsyringe";
+import { TextilHelper } from "../../util/textilHelper";
 
 function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
@@ -49,11 +11,36 @@ function classNames(...classes) {
 export default function JobPostings({ signer }) {
 
     const [newJobPost, setNewJobPost] = useState(false);
+    const [jobPostings, setJobPostings] = useState([]);
+    const [currentTab, setCurrentTab] = useState(0);
+    const textilHelper = container.resolve(TextilHelper);
 
     const onSave = async (jobPost) => {
-        console.log('saving a new job post', jobPost);
+        try {
+            console.log('saving a new job post', jobPost);
+            const result = await textilHelper.createJobPost(jobPost);
+            setJobPostings([jobPost, ...jobPostings]);
+        } catch (e) {
+            console.error(e);
+        }
         setNewJobPost(false);
     }
+
+    useEffect(() => {
+        const getJobPosts = async () => {
+            try {
+                console.log('Loading jobs...');
+                const address = await signer.getAddress();
+                const result = await textilHelper.queryJobPostsByRecruiter(address);
+                setJobPostings(result.map((jobPost) => { return { ...jobPost, isPublished: jobPost.publishedId ? true : false, isClosed: false } }));
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        if (textilHelper && signer) getJobPosts();
+
+    }, []);
 
     return (
         <div className="px-4 py-6 sm:px-6 lg:px-8">
@@ -64,19 +51,25 @@ export default function JobPostings({ signer }) {
                             <span className="isolate inline-flex rounded-md shadow-sm">
                                 <button
                                     type="button"
-                                    className="relative inline-flex items-center rounded-l-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:z-10 focus:bg-gray-600 focus:text-white focus:outline-none"
+                                    onClick={() => setCurrentTab(0)}
+                                    className={currentTab !== 0 ? "relative inline-flex items-center rounded-l-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:z-10 focus:bg-gray-600 focus:text-white focus:outline-none" :
+                                        "relative inline-flex items-center rounded-l-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium z-10 bg-gray-600 text-white outline-none"}
                                 >
                                     Draft
                                 </button>
                                 <button
                                     type="button"
-                                    className="relative -ml-px inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:z-10 focus:bg-gray-600 focus:text-white focus:outline-none"
+                                    onClick={() => setCurrentTab(1)}
+                                    className={currentTab !== 1 ? "relative -ml-px inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:z-10 focus:bg-gray-600 focus:text-white focus:outline-none" :
+                                        "relative -ml-px inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium z-10 bg-gray-600 text-white outline-none"}
                                 >
                                     Published
                                 </button>
                                 <button
                                     type="button"
-                                    className="relative -ml-px inline-flex items-center rounded-r-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:z-10 focus:bg-gray-600 focus:text-white focus:outline-none"
+                                    onClick={() => setCurrentTab(2)}
+                                    className={currentTab !== 2 ? "relative -ml-px inline-flex items-center rounded-r-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:z-10 focus:bg-gray-600 focus:text-white focus:outline-none" :
+                                        "relative -ml-px inline-flex items-center rounded-r-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium z-10 bg-gray-600 text-white outline-none"}
                                 >
                                     Past
                                 </button>
@@ -112,6 +105,11 @@ export default function JobPostings({ signer }) {
                                     >
                                         Openings
                                     </th>
+                                    {currentTab !== 0 &&
+                                        <th
+                                            scope="col"
+                                            className="hidden px-3 py-3.5 text-right text-sm font-semibold text-gray-900 lg:table-cell"
+                                        >Hired</th>}
                                     <th scope="col" className="px-3 py-3.5 text-right text-sm font-semibold text-gray-900">
                                         Bounty
                                     </th>
@@ -127,8 +125,12 @@ export default function JobPostings({ signer }) {
                                 </tr>
                             </thead>
                             <tbody>
-                                {jobPostings.map((jobPosition, jobIdx) => (
-                                    <tr key={jobPosition.id}>
+                                {jobPostings.filter((element) => {
+                                    if (currentTab === 0) return !element.isPublished;
+                                    if (currentTab === 1) return element.isPublished;
+                                    if (currentTab === 2) return element.isClosed;
+                                }).map((jobPosition, jobIdx) => (
+                                    <tr key={jobPosition._id}>
                                         <td
                                             className={classNames(
                                                 jobIdx === 0 ? '' : 'border-t border-transparent',
@@ -156,6 +158,16 @@ export default function JobPostings({ signer }) {
                                         >
                                             {jobPosition.positionsToFill}
                                         </td>
+                                        {currentTab !== 0 &&
+                                            <td
+                                                className={classNames(
+                                                    jobIdx === 0 ? '' : 'border-t border-gray-200',
+                                                    'hidden px-3 py-3.5 text-sm text-right text-gray-500 lg:table-cell'
+                                                )}
+                                            >
+                                                {jobPosition.hired || 0}
+                                            </td>
+                                        }
                                         <td
                                             className={classNames(
                                                 jobIdx === 0 ? '' : 'border-t border-gray-200',
@@ -179,13 +191,22 @@ export default function JobPostings({ signer }) {
                                                 'relative py-3.5 pl-3 pr-4 sm:pr-6 text-right text-sm font-medium'
                                             )}
                                         >
-                                            <button
-                                                type="button"
-                                                className="inline-flex items-center rounded-md border border-gray-300 bg-indigo-600 px-3 py-2 text-sm font-medium leading-4 text-white shadow-sm hover:bg-indigo-700 focus:outline-none disabled:cursor-not-allowed disabled:opacity-30"
-                                                disabled={jobPosition.isCurrent}
-                                            >
-                                                Publish<span className="sr-only"></span>
-                                            </button>
+                                            {currentTab === 0 &&
+                                                <button
+                                                    type="button"
+                                                    className="inline-flex items-center rounded-md border border-gray-300 bg-indigo-600 px-3 py-2 text-sm font-medium leading-4 text-white shadow-sm hover:bg-indigo-700 focus:outline-none disabled:cursor-not-allowed disabled:opacity-30"
+                                                >
+                                                    Publish<span className="sr-only"></span>
+                                                </button>}
+
+                                            {currentTab === 1 &&
+                                                <button
+                                                    type="button"
+                                                    className="inline-flex items-center rounded-md border border-gray-300 bg-indigo-600 px-3 py-2 text-sm font-medium leading-4 text-white shadow-sm hover:bg-indigo-700 focus:outline-none disabled:cursor-not-allowed disabled:opacity-30"
+                                                >
+                                                    Close<span className="sr-only"></span>
+                                                </button>}
+
                                             {jobIdx !== 0 ? <div className="absolute right-6 left-0 -top-px h-px bg-gray-200" /> : null}
                                         </td>
                                     </tr>
