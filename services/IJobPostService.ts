@@ -11,4 +11,5 @@ export interface IJobPostService {
   closeJobOffer: (signer: ethers.Signer, jobId: string) => void;
   getMyJobs: (signer: ethers.Signer) => void;
   getAaveWethBalance: () => Promise<string>;
+  getHiredCount: (jobId: string) => Promise<number>;
 }
