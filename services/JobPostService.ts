@@ -27,9 +27,14 @@ export class JobPostService implements IJobPostService {
     const signedContract = this.jobsContract.connect(signer);
     const tx = await signedContract.publishJob(
       ethers.utils.formatBytes32String(payload.jobId),
-      ethers.utils.parseEther(`${payload.bountyAmount}`),
+      payload.token
+        ? ethers.utils.parseEther(`${payload.bountyAmount}`)
+        : ethers.utils.parseEther("0"),
       payload.token ??
-        ethers.utils.getAddress("0x0000000000000000000000000000000000000000")
+        ethers.utils.getAddress("0x0000000000000000000000000000000000000000"),
+      {
+        value: ethers.utils.parseEther(`${payload.bountyAmount}`),
+      }
     );
     const receipt = await tx.wait();
     return receipt;
