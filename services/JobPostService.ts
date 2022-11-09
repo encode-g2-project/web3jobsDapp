@@ -62,6 +62,7 @@ export class JobPostService implements IJobPostService {
     return value;
   }
   async getAaveWethBalance() {
-    return await this.jobsContract.getAaveBalance();
+    const balanceBN = await this.jobsContract.getAaveBalance();
+    return ethers.utils.formatEther(balanceBN);
   }
 }
