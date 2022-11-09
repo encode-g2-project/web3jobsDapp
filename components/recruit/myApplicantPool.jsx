@@ -2,14 +2,16 @@ import { useEffect, useState } from 'react';
 import Moment from 'react-moment';
 import { container } from "tsyringe";
 import { TextilHelper } from "../../util/TextilHelper";
+import { ApplicationStatus } from "../../services/IJobApplicationService"
 
 function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
 }
 
-export default function MyApplicantPool({ signer }) {
+export default function MyApplicantPool({ signer, jobApplicationServiceInstance }) {
 
     const [applicants, setApplicants] = useState([]);
+    const [processing, setProcessing] = useState(false);
     const textilHelper = container.resolve(TextilHelper);
 
     const queryMyApplicants = async () => {
@@ -21,6 +23,29 @@ export default function MyApplicantPool({ signer }) {
             setApplicants(result.map(job => {
                 return { ...job, status: 'Screening' };
             }));
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    const onChangStatus = async (applicantion, newStatus) => {
+        try {
+            setProcessing(true);
+            const newApplication = { ...applicantion };
+            await jobApplicationServiceInstance.changeApplicationStatus(signer, {
+                jobId: applicantion.publishedId,
+                applicantAddress: applicantion.applicantAddress,
+                status: parseInt(newStatus)
+            });
+
+            /*  newJobPost.publishedId = publishedId;
+             newJobPost.publishedAt = new Date().toISOString();
+             newJobPost.isPublished = true;
+             console.log('updating job post', newJobPost);
+             const result = await textilHelper.updateJobPost(newJobPost); */
+            queryMyApplicants();
+            //TODO call the contract to change status
+            console.log('onChangStatus', event.target.value);
         } catch (e) {
             console.error(e);
         }
@@ -146,13 +171,14 @@ export default function MyApplicantPool({ signer }) {
                                             name="location"
                                             className="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
                                             defaultValue={applicant.status}
+                                            onChange={e => onChangStatus(e.target.value, applicant)}
                                         >
-                                            <option>Screening</option>
-                                            <option>Interview</option>
-                                            <option>Assessment</option>
-                                            <option>F. Interview</option>
-                                            <option>Hired</option>
-                                            <option>Rejected</option>
+                                            <option value={ApplicationStatus.SCREENING}>Screening</option>
+                                            <option value={ApplicationStatus.FIRST_INTERVIEW}>Interview</option>
+                                            <option value={ApplicationStatus.TECHNICAL_TEST}>Assessment</option>
+                                            <option value={ApplicationStatus.FINAL_INTERVIEW}>F. Interview</option>
+                                            <option value={ApplicationStatus.HIRED}>Hired</option>
+                                            <option value={ApplicationStatus.REJECTED}>Rejected</option>
                                         </select>
                                         {applicantIdx !== 0 ? <div className="absolute right-6 left-0 -top-px h-px bg-gray-200" /> : null}
                                     </td>

@@ -52,7 +52,7 @@ export class JobApplicationService implements IJobApplicationService {
     const signedContract = this.jobsContract.connect(signer);
     const tx = await signedContract.changeApplicationStatus(
       payload.applicantAddress,
-      ethers.utils.formatBytes32String(payload.jobId),
+      payload.jobId,
       payload.status
     );
     const receipt = await tx.wait();
