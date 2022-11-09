@@ -1,22 +1,17 @@
 import { Fragment } from 'react'
+import { ethers } from "ethers";
 import { Popover, Transition } from '@headlessui/react'
 import {
-  ArrowPathIcon,
   Bars3Icon,
   BookmarkSquareIcon,
-  CalendarIcon,
-  ChartBarIcon,
-  CursorArrowRaysIcon,
-  LifebuoyIcon,
   MagnifyingGlassCircleIcon,
-  PhoneIcon,
   PlayIcon,
-  ShieldCheckIcon,
   Squares2X2Icon,
   UserGroupIcon,
   XMarkIcon,
 } from '@heroicons/react/24/outline'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
+import { connected } from 'process';
 
 const applyOptions = [
   {
@@ -60,7 +55,7 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
-export default function Header({ onChangeOption }) {
+export default function Header({ onChangeOption, onConnect, signer, isConnected }) {
   return (
     <Popover className="relative bg-white">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
@@ -207,9 +202,10 @@ export default function Header({ onChangeOption }) {
 
             <a
               href="#"
+              onClick={e => { e.preventDefault(); onConnect(); }}
               className="ml-8 inline-flex items-center justify-center whitespace-nowrap rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-indigo-700"
             >
-              Connect
+              {isConnected ? "Connected" : "Connect"}
             </a>
           </div>
         </div>
@@ -294,6 +290,6 @@ export default function Header({ onChangeOption }) {
           </div>
         </Popover.Panel>
       </Transition>
-    </Popover>
+    </Popover >
   )
 }
