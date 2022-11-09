@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 export interface PublishJobPayload {
   jobId: string;
   bountyAmount: number;
-  token: string;
+  token?: string;
 }
 
 export interface IJobPostService {

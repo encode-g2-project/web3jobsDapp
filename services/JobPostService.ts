@@ -3,7 +3,7 @@ import { IJobPostService, PublishJobPayload } from "./IJobPostService";
 import { injectable } from "tsyringe";
 import web3JobsJson from "../assets/web3Jobs.json";
 
-const CONTRACT_ADDRESS = "0x145356Af39a75d9c11bB19e834cbA6084f7887b7"; // Jobs contract
+const CONTRACT_ADDRESS = "0x4D8Aef7882E6AaF221eFb7fA3649D069f7117Fc3"; // Jobs contract
 const CONTRACT_ABI = web3JobsJson.abi; // Jobs contract ABI
 
 @injectable()
@@ -27,8 +27,9 @@ export class JobPostService implements IJobPostService {
     const signedContract = this.jobsContract.connect(signer);
     const tx = await signedContract.publishJob(
       ethers.utils.formatBytes32String(payload.jobId),
-      payload.bountyAmount,
-      payload.token
+      ethers.utils.parseEther(`${payload.bountyAmount}`),
+      payload.token ??
+        ethers.utils.getAddress("0x0000000000000000000000000000000000000000")
     );
     const receipt = await tx.wait();
     return receipt;
