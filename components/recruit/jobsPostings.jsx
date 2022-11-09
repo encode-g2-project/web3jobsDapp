@@ -55,6 +55,7 @@ export default function JobPostings({ signer, jobPostServiceInstance }) {
             setProcessing(true);
             const newJobPost = { ...jobPost };
             //TODO call smart contract method tp publish and setup the publishedId
+            await jobPostServiceInstance.closeJobOffer(signer, jobPost.publishedId);
             newJobPost.closedAt = new Date().toISOString();
             newJobPost.isClosed = true;
             newJobPost.isPublished = false;

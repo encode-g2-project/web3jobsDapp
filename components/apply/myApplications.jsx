@@ -2,13 +2,14 @@ import { useEffect, useState } from 'react';
 import Moment from 'react-moment';
 import { container } from "tsyringe";
 import { TextilHelper } from "../../util/TextilHelper";
+import { ApplicationStatus } from "../../services/IJobApplicationService"
 
 function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
 }
 
-export default function MyApplications({ signer }) {
-
+export default function MyApplications({ signer, jobApplicationServiceInstance }) {
+    const [processing, setProcessing] = useState(undefined)
     const [myApplications, setMyApplications] = useState([]);
     const textilHelper = container.resolve(TextilHelper);
 
@@ -18,12 +19,43 @@ export default function MyApplications({ signer }) {
             const result = await textilHelper.queryMyApplications(await signer.getAddress());
             //TODO call contract method myApplications to get statuses frok blockchain
             console.log('Loading applications...', result);
-            setMyApplications(result.map(job => {
-                return { ...job, status: 'Screening' };
-            }));
+
+            const newList = result.map(applicant => {
+                return { ...applicant, status: -1 };
+            });
+
+            setMyApplications(newList);
+
+            for (let i = 0; i < newList.length; i++) {
+                let status = ApplicationStatus.SCREENING;
+                try {
+                    status = await jobApplicationServiceInstance.getApplicants(newList[i].applicantAddress, newList[i].publishedId, 0);
+                    console.log('status', status);
+                } catch (error) {
+                    console.log("Not found");
+                }
+                newList[i].status = status;
+            }
+
+            setMyApplications([...newList]);
+
         } catch (e) {
             console.error(e);
         }
+    }
+
+    const onClaim = async (application) => {
+        try {
+            console.log(application);
+            setProcessing(application._id);
+
+            await jobApplicationServiceInstance.claimBounty(signer, application.publishedId);
+
+            queryMyApplications();
+        } catch (e) {
+            console.error(e);
+        }
+        setProcessing(undefined);
     }
 
     useEffect(() => {
@@ -72,7 +104,7 @@ export default function MyApplications({ signer }) {
                         </thead>
                         <tbody>
                             {myApplications.map((application, applicationIdx) => (
-                                <tr key={application._id}>
+                                <tr key={`${applicationIdx}_${application._id}`}>
                                     <td
                                         className={classNames(
                                             applicationIdx === 0 ? '' : 'border-t border-transparent',
@@ -119,10 +151,11 @@ export default function MyApplications({ signer }) {
                                     >
                                         <button
                                             type="button"
+                                            onClick={() => onClaim(application)}
                                             className="inline-flex items-center rounded-md border border-gray-300 bg-indigo-600 px-3 py-2 text-sm font-medium leading-4 text-white shadow-sm hover:bg-indigo-700 focus:outline-none disabled:cursor-not-allowed disabled:opacity-30"
-                                            disabled={application.status !== 'Rejected'}
+                                            disabled={application.status !== ApplicationStatus.REJECTED || processing === application._id}
                                         >
-                                            Claim<span className="sr-only"></span>
+                                            {application._id === processing ? "Claiming...." : "Claim"}<span className="sr-only"></span>
                                         </button>
                                         {applicationIdx !== 0 ? <div className="absolute right-6 left-0 -top-px h-px bg-gray-200" /> : null}
                                     </td>

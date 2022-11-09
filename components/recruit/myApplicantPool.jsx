@@ -32,7 +32,7 @@ export default function MyApplicantPool({ signer, jobApplicationServiceInstance 
                     status = await jobApplicationServiceInstance.getApplicants(newList[i].applicantAddress, newList[i].publishedId, 0);
                     console.log('status', status);
                 } catch (error) {
-                    console.log(error);
+                    console.log("Not found");
                 }
                 newList[i].status = status;
             }
@@ -150,7 +150,7 @@ export default function MyApplicantPool({ signer, jobApplicationServiceInstance 
                                         )}
                                     >
                                         <div className="font-medium text-gray-900">
-                                            <span title='applicant.applicantAddress'>{applicant.applicantAddress.substring(applicant.applicantAddress.length - 15, applicant.applicantAddress.length)}...</span>
+                                            <span title='applicant.applicantAddress'>...{applicant.applicantAddress.substring(applicant.applicantAddress.length - 15, applicant.applicantAddress.length)}</span>
                                         </div>
                                         {applicantIdx !== 0 ? <div className="absolute right-0 left-6 -top-px h-px bg-gray-200" /> : null}
                                     </td>
@@ -168,7 +168,7 @@ export default function MyApplicantPool({ signer, jobApplicationServiceInstance 
                                             'hidden px-3 py-3.5 text-sm text-left text-gray-500 lg:table-cell'
                                         )}
                                     >
-                                        <Moment date={applicant.applied} fromNow={true} />
+                                        <Moment date={applicant.createdAt} fromNow={true} />
                                     </td>
 
                                     <td
@@ -183,6 +183,7 @@ export default function MyApplicantPool({ signer, jobApplicationServiceInstance 
                                                 name="location"
                                                 className="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
                                                 defaultValue={applicant.status}
+                                                disabled={processing === applicant._id}
                                                 onChange={e => onChangStatus(applicant, e.target.value)}
                                             >
                                                 <option value={ApplicationStatus.SCREENING}>Screening</option>
