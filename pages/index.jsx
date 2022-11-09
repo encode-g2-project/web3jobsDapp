@@ -99,13 +99,13 @@ export default function Home() {
         <main className="pt-20">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             {/* We've used 3xl here, but feel free to try other max-widths based on your needs */}
-            <div className="mx-auto max-w-4xl">
-              {isConnected && selectedOption.view === "apply" ?
+            {<div className="mx-auto max-w-4xl">
+              {selectedOption.view === "apply" ?
                 <ApplicantView onChangeOption={onChangeOption} searchOptionSelected={selectedOption.option === 'search'} signer={signer} jobApplicationServiceInstance={jobApplicationServiceInstance} jobPostServiceInstance={jobPostServiceInstance} /> :
                 <RecruiterView onChangeOption={onChangeOption} jobPostingsOptionSelected={selectedOption.option === 'jobPostings'} signer={signer} jobApplicationServiceInstance={jobApplicationServiceInstance} jobPostServiceInstance={jobPostServiceInstance} />}
-              {!hasMetaMask && <div className="alert alert-danger" role="alert"> You need Metamask to use this app.</div>}
-              {!isSupportedNetwork && <div className="alert alert-danger" role="alert"> Web3 jobs is currently in beta. Only available on Goerli Tesnet. Change your metamask network!</div>}
-            </div>
+            </div>}
+            {!hasMetaMask && <div className="alert alert-danger" role="alert"> You need Metamask to use this app.</div>}
+            {!isSupportedNetwork && <div className="alert alert-danger" role="alert"> Web3 jobs is currently in beta. Only available on Goerli Tesnet. Change your metamask network!</div>}
           </div>
         </main>
 

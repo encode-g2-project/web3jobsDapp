@@ -34,8 +34,8 @@ export default function RecruiterView({ signer, jobApplicationServiceInstance, j
                 <a className="whitespace-nowrap text-sm text-indigo-600 hover:text-indigo-700 pr-4" href="#" onClick={toggleOption}> {jobPostingsOptionSelected ? "My Applicant Pool" : "Job Postings"}</a>
             </div>
         </div>
-        <div className="h-96 rounded-lg border-2 border-gray-200" >
-            {jobPostingsOptionSelected ? <JobPostings /> : <MyApplicantPool />}
+        <div className="rounded-lg border-2 border-gray-200" >
+            {jobPostingsOptionSelected ? <JobPostings signer={signer} /> : <MyApplicantPool signer={signer} />}
         </div>
     </div>)
 }

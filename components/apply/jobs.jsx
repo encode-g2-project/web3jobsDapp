@@ -3,7 +3,7 @@ import Moment from 'react-moment';
 
 const publishedJobs = [
     {
-        id: 1,
+        _id: 1,
         title: 'Frontend Developer',
         description: 'We are looking for a Frontend Developer to join our team. You will be responsible for building the ‘client-side’ of our web applications. You should be able to translate our company and customer needs into functional and appealing interactive applications. If you’re also familiar with Agile methodologies and are passionate about the possibilities that the Web holds, we’d like to meet you. Ultimately, you will work with our team to create a unique user experience through our web applications.',
         company: 'Aave',
@@ -15,7 +15,7 @@ const publishedJobs = [
         bountyAmount: 10000
     },
     {
-        id: 2,
+        _id: 2,
         title: 'Software Engineer',
         description: 'We are looking for a Frontend Developer to join our team. You will be responsible for building the ‘client-side’ of our web applications. You should be able to translate our company and customer needs into functional and appealing interactive applications. If you’re also familiar with Agile methodologies and are passionate about the possibilities that the Web holds, we’d like to meet you. Ultimately, you will work with our team to create a unique user experience through our web applications.',
         company: 'Encode Club',
@@ -27,7 +27,7 @@ const publishedJobs = [
         bountyAmount: 5000
     },
     {
-        id: 3,
+        _id: 3,
         title: 'Project Manager',
         description: 'We are looking for a Frontend Developer to join our team. You will be responsible for building the ‘client-side’ of our web applications. You should be able to translate our company and customer needs into functional and appealing interactive applications. If you’re also familiar with Agile methodologies and are passionate about the possibilities that the Web holds, we’d like to meet you. Ultimately, you will work with our team to create a unique user experience through our web applications.',
         company: 'Miro',
@@ -45,12 +45,12 @@ function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
 }
 
-export default function Jobs() {
+export default function Jobs({ signer }) {
     return (
         <div className="px-4 py-6 sm:px-6 lg:px-8">
             <div className="sm:flex sm:items-center">
                 <div className="sm:flex-auto">
-                    
+
                 </div>
                 <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
                     <SearchBox />
@@ -145,7 +145,8 @@ export default function Jobs() {
                                     <button
                                         type="button"
                                         className="inline-flex items-center rounded-md border border-gray-300 bg-indigo-600 px-3 py-2 text-sm font-medium leading-4 text-white shadow-sm hover:bg-indigo-700 focus:outline-none disabled:cursor-not-allowed disabled:opacity-30"
-                                        disabled={jobPosition.isCurrent}
+                                        disabled={!signer}
+                                        title={signer ? '' : 'Connect your wallet to apply'}
                                     >
                                         Apply<span className="sr-only"></span>
                                     </button>
