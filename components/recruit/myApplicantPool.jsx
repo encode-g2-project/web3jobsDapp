@@ -1,37 +1,37 @@
-import SearchBox from "../searchBox"
+import { useEffect, useState } from 'react';
 import Moment from 'react-moment';
-
-const applicants = [
-    {
-        _id: 1,
-        title: 'Frontend Developer',
-        name: 'John Doe',
-        publishedId: 'XXX123456',
-        createdAt: new Date(),
-        applied: new Date(),
-        recruiterAddress: '0x123',
-        applicantAddress: '0x124',
-        status: 'Rejected'
-    },
-    {
-        _id: 2,
-        title: 'Software Engineer',
-        name: 'Carl Johnson',
-        publishedId: 'XXX123452',
-        createdAt: new Date(),
-        applied: new Date(),
-        recruiterAddress: '0x123',
-        applicantAddress: '0x124',
-        status: 'F. Interview'
-    }
-    // More plans...
-]
+import { container } from "tsyringe";
+import { TextilHelper } from "../../util/TextilHelper";
 
 function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
 }
 
 export default function MyApplicantPool({ signer }) {
+
+    const [applicants, setApplicants] = useState([]);
+    const textilHelper = container.resolve(TextilHelper);
+
+    const queryMyApplicants = async () => {
+        try {
+            console.log('Loading applications...');
+            const result = await textilHelper.queryApplicantionsByRecruiter(await signer.getAddress());
+            //TODO call contract method myApplicants to get statuses from blockchain
+            console.log('Loading applications...', result);
+            setApplicants(result.map(job => {
+                return { ...job, status: 'Screening' };
+            }));
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    useEffect(() => {
+
+        if (textilHelper && signer) queryMyApplicants();
+
+    }, []);
+
     return (
         <div className="px-4 py-6 sm:px-6 lg:px-8">
             {signer ? <>
@@ -87,9 +87,6 @@ export default function MyApplicantPool({ signer }) {
                                 <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
                                     Address
                                 </th>
-                                <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
-                                    Name
-                                </th>
                                 <th
                                     scope="col"
                                     className="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 lg:table-cell"
@@ -120,14 +117,6 @@ export default function MyApplicantPool({ signer }) {
                                             {applicant.applicantAddress}
                                         </div>
                                         {applicantIdx !== 0 ? <div className="absolute right-0 left-6 -top-px h-px bg-gray-200" /> : null}
-                                    </td>
-                                    <td
-                                        className={classNames(
-                                            applicantIdx === 0 ? '' : 'border-t border-gray-200',
-                                            'hidden px-3 py-3.5 text-sm text-gray-500 lg:table-cell'
-                                        )}
-                                    >
-                                        {applicant.name}
                                     </td>
                                     <td
                                         className={classNames(

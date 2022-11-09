@@ -66,6 +66,42 @@ export class TextilHelper {
     },
   }
 
+  private jobApplicationSchema = {
+    title: "JobApplication",
+    type: "object",
+    required: ["_id"],
+    properties: {
+      _id: {
+        type: "string",
+        description: "The instance's id.",
+      },
+      applicantName: {
+        type: "string"
+      },
+      jobPostingId: {
+        type: "string"
+      },
+      title: {
+        type: "string"
+      },
+      company: {
+        type: "string"
+      },
+      publishedId: {
+        type: "string"
+      },
+      applicantAddress: {
+        type: "string"
+      },
+      recruiterAddress: {
+        type: "string"
+      },
+      createdAt: {
+        type: "string",
+      }
+    },
+  }
+
 
   private client: Client;
 
@@ -106,29 +142,62 @@ export class TextilHelper {
     return thread;
   }
 
-  async createCollection() {
+  async createjobPostingCollection() {
     const client = await this.getClient();
     return await (client).newCollection(this.threadId, { name: 'jobPosting', schema: this.jobPostingSchema })
   }
 
-  async updateCollection() {
+  async updatejobPostingCollection() {
     const client = await this.getClient();
     return await (client).updateCollection(this.threadId, { name: 'jobPosting', schema: this.jobPostingSchema })
+  }
+
+  async createJobApplicationCollection() {
+    const client = await this.getClient();
+    return await (client).newCollection(this.threadId, { name: 'JobApplication', schema: this.jobApplicationSchema })
+  }
+
+  async updateJobApplicationCollection() {
+    const client = await this.getClient();
+    return await (client).updateCollection(this.threadId, { name: 'JobApplication', schema: this.jobApplicationSchema })
   }
 
   async createJobPost(jobPosting: any) {
     const client = await this.getClient();
     return await client.create(this.threadId, 'jobPosting', [jobPosting]);
   }
+
   async updateJobPost(jobPosting: any) {
     const client = await this.getClient();
     return await client.save(this.threadId, 'jobPosting', [jobPosting]);
+  }
+
+  async createJobApplication(jobApplication: any) {
+    const client = await this.getClient();
+    return await client.create(this.threadId, 'JobApplication', [jobApplication]);
+  }
+
+  async updateJobApplication(jobApplication: any) {
+    const client = await this.getClient();
+    return await client.save(this.threadId, 'JobApplication', [jobApplication]);
   }
 
   async queryJobPostsByRecruiter (recruiterAddress: string) {
     const query = new Where('recruiterAddress').eq(recruiterAddress);
     const client = await this.getClient();
     return await client.find<any>(this.threadId, 'jobPosting', query)
+  }
+
+  async queryApplicantionsByRecruiter (recruiterAddress: string) {
+    const query = new Where('recruiterAddress').eq(recruiterAddress);
+    const client = await this.getClient();
+    return await client.find<any>(this.threadId, 'JobApplication', query)
+  }
+
+  async queryMyApplications (applicantAddress: string) {
+    const query = new Where('applicantAddress').eq(applicantAddress);
+    const client = await this.getClient();
+    return await client.find<any>(this.threadId, 'JobApplication', query)
   }
 
   async queryAllPublishedJobPosts () {

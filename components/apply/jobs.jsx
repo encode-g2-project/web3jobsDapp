@@ -3,6 +3,7 @@ import Moment from 'react-moment';
 import { container } from "tsyringe";
 import { TextilHelper } from "../../util/TextilHelper";
 import { useEffect, useState } from "react";
+import uuid from 'react-uuid';
 
 function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
@@ -17,12 +18,45 @@ export default function Jobs({ signer }) {
     const queryJobPosts = async () => {
         try {
             console.log('Loading jobs...');
-            const result = await textilHelper.queryAllPublishedJobPosts();
-            console.log('Loading jobs...', result);
-            setPublishedJobs(result);
+            const resultJobs = await textilHelper.queryAllPublishedJobPosts();
+            if (signer) {
+                const resultApplications = await textilHelper.queryMyApplications(await signer.getAddress());
+                console.log('Loading jobs...', resultJobs);
+                setPublishedJobs(resultJobs.map(job => {
+                    const isApplied = resultApplications.find(app => app.jobPostingId === job._id);
+                    return { ...job, isApplied };
+                }));
+            }
+            else setPublishedJobs(resultJobs);
         } catch (e) {
             console.error(e);
         }
+    }
+
+    const onApply = async (jobPost) => {
+        try {
+            setProcessing(true);
+            //TODO call the contract tp apply
+
+            const newApplication = {
+                _id: uuid(),
+                applicantName: await signer.getAddress(),
+                jobPostingId: jobPost._id,
+                title: jobPost.title,
+                company: jobPost.company,
+                createdAt: new Date().toISOString(),
+                publishedId: jobPost.publishedId,
+                recruiterAddress: jobPost.recruiterAddress,
+                applicantAddress: await signer.getAddress()
+            };
+            const result = await textilHelper.createJobApplication(newApplication);
+            console.log('result', result);
+            queryJobPosts();
+
+        } catch (e) {
+            console.error(e);
+        }
+        setProcessing(false);
     }
 
     useEffect(() => {
@@ -129,11 +163,12 @@ export default function Jobs({ signer }) {
                                 >
                                     <button
                                         type="button"
+                                        onClick={() => onApply(jobPosition)}
                                         className="inline-flex items-center rounded-md border border-gray-300 bg-indigo-600 px-3 py-2 text-sm font-medium leading-4 text-white shadow-sm hover:bg-indigo-700 focus:outline-none disabled:cursor-not-allowed disabled:opacity-30"
-                                        disabled={!signer}
+                                        disabled={!signer || jobPosition.isApplied || processing}
                                         title={signer ? '' : 'Connect your wallet to apply'}
                                     >
-                                        Apply<span className="sr-only"></span>
+                                        {processing ? "Applying ..." : jobPosition.isApplied ? "Applied" : "Apply"} <span className="sr-only"></span>
                                     </button>
                                     {jobIdx !== 0 ? <div className="absolute right-6 left-0 -top-px h-px bg-gray-200" /> : null}
                                 </td>

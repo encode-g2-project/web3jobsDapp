@@ -1,39 +1,37 @@
-import SearchBox from "../searchBox"
+import { useEffect, useState } from 'react';
 import Moment from 'react-moment';
-
-const myApplications = [
-    {
-        _id: 1,
-        title: 'Frontend Developer',
-        description: 'We are looking for a Frontend Developer to join our team. You will be responsible for building the ‘client-side’ of our web applications. You should be able to translate our company and customer needs into functional and appealing interactive applications. If you’re also familiar with Agile methodologies and are passionate about the possibilities that the Web holds, we’d like to meet you. Ultimately, you will work with our team to create a unique user experience through our web applications.',
-        company: 'Aave',
-        publishedId: 'XXX123456',
-        createdAt: new Date(),
-        applied: new Date(),
-        recruiterAddress: '0x123',
-        applicantAddress: '0x124',
-        status: 'Rejected'
-    },
-    {
-        _id: 2,
-        title: 'Software Engineer',
-        description: 'We are looking for a Frontend Developer to join our team. You will be responsible for building the ‘client-side’ of our web applications. You should be able to translate our company and customer needs into functional and appealing interactive applications. If you’re also familiar with Agile methodologies and are passionate about the possibilities that the Web holds, we’d like to meet you. Ultimately, you will work with our team to create a unique user experience through our web applications.',
-        company: 'Encode Club',
-        publishedId: 'XXX123452',
-        createdAt: new Date(),
-        applied: new Date(),
-        recruiterAddress: '0x123',
-        applicantAddress: '0x124',
-        status: 'F. Interview'
-    }
-    // More plans...
-]
+import { container } from "tsyringe";
+import { TextilHelper } from "../../util/TextilHelper";
 
 function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
 }
 
 export default function MyApplications({ signer }) {
+
+    const [myApplications, setMyApplications] = useState([]);
+    const textilHelper = container.resolve(TextilHelper);
+
+    const queryMyApplications = async () => {
+        try {
+            console.log('Loading applications...');
+            const result = await textilHelper.queryMyApplications(await signer.getAddress());
+            //TODO call contract method myApplications to get statuses frok blockchain
+            console.log('Loading applications...', result);
+            setMyApplications(result.map(job => {
+                return { ...job, status: 'Screening' };
+            }));
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    useEffect(() => {
+
+        if (textilHelper && signer) queryMyApplications();
+
+    }, []);
+
     return (
         <div className="px-4 py-6 sm:px-6 lg:px-8">
             <div className="sm:flex sm:items-center">
@@ -100,7 +98,7 @@ export default function MyApplications({ signer }) {
                                             'hidden px-3 py-3.5 text-sm text-left text-gray-500 lg:table-cell'
                                         )}
                                     >
-                                        <Moment date={application.applied} fromNow={true} />
+                                        <Moment date={application.createdAt} fromNow={true} />
                                     </td>
                                     <td
                                         className={classNames(
