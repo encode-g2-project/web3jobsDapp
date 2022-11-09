@@ -1,4 +1,4 @@
-import { ethers } from "ethers";
+import { BigNumber, ethers } from "ethers";
 import { IJobPostService, PublishJobPayload } from "./IJobPostService";
 import { injectable } from "tsyringe";
 import { CONTRACT_ABI, CONTRACT_ADDRESS } from "./constants";
@@ -61,5 +61,9 @@ export class JobPostService implements IJobPostService {
   async getAaveWethBalance() {
     const balanceBN = await this.jobsContract.getAaveBalance();
     return ethers.utils.formatEther(balanceBN);
+  }
+  async getHiredCount(jobId: string): Promise<number> {
+    const countBN: BigNumber = await this.jobsContract.Hired(jobId);
+    return countBN.toNumber();
   }
 }
