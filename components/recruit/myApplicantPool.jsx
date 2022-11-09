@@ -11,44 +11,55 @@ function classNames(...classes) {
 export default function MyApplicantPool({ signer, jobApplicationServiceInstance }) {
 
     const [applicants, setApplicants] = useState([]);
-    const [processing, setProcessing] = useState(false);
+    const [processing, setProcessing] = useState(undefined)
     const textilHelper = container.resolve(TextilHelper);
 
     const queryMyApplicants = async () => {
         try {
             console.log('Loading applications...');
             const result = await textilHelper.queryApplicantionsByRecruiter(await signer.getAddress());
-            //TODO call contract method myApplicants to get statuses from blockchain
             console.log('Loading applications...', result);
-            setApplicants(result.map(job => {
-                return { ...job, status: 'Screening' };
-            }));
+
+            const newList = result.map(applicant => {
+                return { ...applicant, status: -1 };
+            });
+
+            setApplicants(newList);
+
+            for (let i = 0; i < newList.length; i++) {
+                let status = ApplicationStatus.SCREENING;
+                try {
+                    status = await jobApplicationServiceInstance.getApplicants(newList[i].applicantAddress, newList[i].publishedId, 0);
+                    console.log('status', status);
+                } catch (error) {
+                    console.log(error);
+                }
+                newList[i].status = status;
+            }
+
+            setApplicants([...newList]);
+
         } catch (e) {
             console.error(e);
         }
     }
 
-    const onChangStatus = async (applicantion, newStatus) => {
+    const onChangStatus = async (application, newStatus) => {
         try {
-            setProcessing(true);
-            const newApplication = { ...applicantion };
+            console.log(application);
+            setProcessing(application._id);
+
             await jobApplicationServiceInstance.changeApplicationStatus(signer, {
-                jobId: applicantion.publishedId,
-                applicantAddress: applicantion.applicantAddress,
+                jobId: application.publishedId,
+                applicantAddress: application.applicantAddress,
                 status: parseInt(newStatus)
             });
 
-            /*  newJobPost.publishedId = publishedId;
-             newJobPost.publishedAt = new Date().toISOString();
-             newJobPost.isPublished = true;
-             console.log('updating job post', newJobPost);
-             const result = await textilHelper.updateJobPost(newJobPost); */
             queryMyApplicants();
-            //TODO call the contract to change status
-            console.log('onChangStatus', event.target.value);
         } catch (e) {
             console.error(e);
         }
+        setProcessing(undefined);
     }
 
     useEffect(() => {
@@ -131,15 +142,15 @@ export default function MyApplicantPool({ signer, jobApplicationServiceInstance 
                         </thead>
                         <tbody>
                             {applicants.map((applicant, applicantIdx) => (
-                                <tr key={applicant._id}>
+                                <tr key={`${applicantIdx}_${applicant._id}`}>
                                     <td
                                         className={classNames(
                                             applicantIdx === 0 ? '' : 'border-t border-transparent',
-                                            'relative py-4 pl-4 sm:pl-6 pr-3 text-sm'
+                                            'relative py-4 pl-4 sm:pl-6 pr-3 text-smˇˇ'
                                         )}
                                     >
                                         <div className="font-medium text-gray-900">
-                                            {applicant.applicantAddress}
+                                            <span title='applicant.applicantAddress'>{applicant.applicantAddress.substring(applicant.applicantAddress.length - 15, applicant.applicantAddress.length)}...</span>
                                         </div>
                                         {applicantIdx !== 0 ? <div className="absolute right-0 left-6 -top-px h-px bg-gray-200" /> : null}
                                     </td>
@@ -166,20 +177,21 @@ export default function MyApplicantPool({ signer, jobApplicationServiceInstance 
                                             'relative py-3.5 pl-3 pr-4 sm:pr-6 text-right text-sm font-medium'
                                         )}
                                     >
-                                        <select
-                                            id="location"
-                                            name="location"
-                                            className="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-                                            defaultValue={applicant.status}
-                                            onChange={e => onChangStatus(e.target.value, applicant)}
-                                        >
-                                            <option value={ApplicationStatus.SCREENING}>Screening</option>
-                                            <option value={ApplicationStatus.FIRST_INTERVIEW}>Interview</option>
-                                            <option value={ApplicationStatus.TECHNICAL_TEST}>Assessment</option>
-                                            <option value={ApplicationStatus.FINAL_INTERVIEW}>F. Interview</option>
-                                            <option value={ApplicationStatus.HIRED}>Hired</option>
-                                            <option value={ApplicationStatus.REJECTED}>Rejected</option>
-                                        </select>
+                                        {applicant.status === -1 ? <span>Loading...</span> : processing === applicant._id ? <span>Processing...</span> :
+                                            <select
+                                                id="location"
+                                                name="location"
+                                                className="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+                                                defaultValue={applicant.status}
+                                                onChange={e => onChangStatus(applicant, e.target.value)}
+                                            >
+                                                <option value={ApplicationStatus.SCREENING}>Screening</option>
+                                                <option value={ApplicationStatus.FIRST_INTERVIEW}>Interview</option>
+                                                <option value={ApplicationStatus.TECHNICAL_TEST}>Assessment</option>
+                                                <option value={ApplicationStatus.FINAL_INTERVIEW}>F. Interview</option>
+                                                <option value={ApplicationStatus.HIRED}>Hired</option>
+                                                <option value={ApplicationStatus.REJECTED}>Rejected</option>
+                                            </select>}
                                         {applicantIdx !== 0 ? <div className="absolute right-6 left-0 -top-px h-px bg-gray-200" /> : null}
                                     </td>
                                 </tr>
