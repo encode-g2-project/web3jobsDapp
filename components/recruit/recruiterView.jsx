@@ -35,7 +35,7 @@ export default function RecruiterView({ signer, jobApplicationServiceInstance, j
             </div>
         </div>
         <div className="rounded-lg border-2 border-gray-200" >
-            {jobPostingsOptionSelected ? <JobPostings signer={signer} /> : <MyApplicantPool signer={signer} />}
+            {jobPostingsOptionSelected ? <JobPostings signer={signer} jobPostServiceInstance={jobPostServiceInstance} /> : <MyApplicantPool signer={signer} />}
         </div>
     </div>)
 }

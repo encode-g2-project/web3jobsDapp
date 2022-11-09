@@ -19,7 +19,7 @@ export default function ApplicantView({ signer, jobApplicationServiceInstance, j
             </div>
         </div>
         <div className="h-96 rounded-lg border-2 border-gray-200" >
-            {searchOptionSelected ? <Jobs signer={signer} /> : <MyApplications signer={signer} />}
+            {searchOptionSelected ? <Jobs signer={signer} jobApplicationServiceInstance={jobApplicationServiceInstance} /> : <MyApplications signer={signer} />}
         </div>
     </div>)
 }

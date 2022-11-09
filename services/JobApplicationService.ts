@@ -27,9 +27,7 @@ export class JobApplicationService implements IJobApplicationService {
   }
   async newApplication(signer: ethers.Signer, jobId: string) {
     const signedContract = this.jobsContract.connect(signer);
-    const tx = await signedContract.newApplication(
-      ethers.utils.formatBytes32String(jobId)
-    );
+    const tx = await signedContract.newApplication(jobId);
     const receipt = await tx.wait();
     return receipt;
   }

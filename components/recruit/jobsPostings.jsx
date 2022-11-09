@@ -8,7 +8,7 @@ function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
 }
 
-export default function JobPostings({ signer }) {
+export default function JobPostings({ signer, jobPostServiceInstance }) {
 
     const [newJobPost, setNewJobPost] = useState(false);
     const [jobPostings, setJobPostings] = useState([]);
@@ -31,8 +31,13 @@ export default function JobPostings({ signer }) {
         try {
             setProcessing(true);
             const newJobPost = { ...jobPost };
-            //TODO call smart contract method tp publish and setup the publishedId
-            newJobPost.publishedId = "XXXXXXXX";
+
+            const publishedId = await jobPostServiceInstance.publishJob(signer, {
+                jobId: newJobPost._id,
+                bountyAmount: newJobPost.bountyAmount,
+            });
+
+            newJobPost.publishedId = publishedId;
             newJobPost.publishedAt = new Date().toISOString();
             newJobPost.isPublished = true;
             console.log('updating job post', newJobPost);

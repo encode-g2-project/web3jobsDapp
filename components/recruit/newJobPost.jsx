@@ -100,15 +100,15 @@ export default function NewJobPost({ onCancel, onSave, signer }) {
 
                         <div className="sm:col-span-2">
                             <label htmlFor="first-name" className="block text-sm font-medium text-gray-700">
-                                Bounty *
+                                Bounty (Ethers) *
                             </label>
                             <div className="mt-1">
                                 <input
-                                    type="number"
+                                    type="text"
                                     name="bounty"
                                     required
                                     id="bounty"
-                                    placeholder="Ex. $10,000 ..."
+                                    placeholder="Ex. 10"
                                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                                 />
                             </div>
@@ -124,7 +124,7 @@ export default function NewJobPost({ onCancel, onSave, signer }) {
                                     name="positionsToFill"
                                     required
                                     id="positionsToFill"
-                                    placeholder="Ex. $10,000 ..."
+                                    placeholder="Ex. 2 ..."
                                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                                 />
                             </div>

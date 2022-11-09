@@ -9,7 +9,7 @@ function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
 }
 
-export default function Jobs({ signer }) {
+export default function Jobs({ signer, jobApplicationServiceInstance }) {
 
     const [publishedJobs, setPublishedJobs] = useState([]);
     const textilHelper = container.resolve(TextilHelper);
@@ -37,7 +37,7 @@ export default function Jobs({ signer }) {
         try {
             setProcessing(true);
             //TODO call the contract tp apply
-
+            await jobApplicationServiceInstance.newApplication(signer, jobPost.publishedId);
             const newApplication = {
                 _id: uuid(),
                 applicantName: await signer.getAddress(),
