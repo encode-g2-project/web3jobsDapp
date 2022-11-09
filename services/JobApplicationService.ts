@@ -63,4 +63,12 @@ export class JobApplicationService implements IJobApplicationService {
     const value = await signedContract.getMyApplications();
     return value;
   }
+  async getApplicants(applicantAddress: string, jobId: string, index: number) {
+    const value = await this.jobsContract.Applicants(
+      applicantAddress,
+      jobId,
+      index
+    );
+    return value;
+  }
 }
