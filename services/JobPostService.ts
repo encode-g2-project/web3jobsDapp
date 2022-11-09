@@ -1,9 +1,9 @@
-import { ethers } from "ethers";
+import { BigNumber, ethers } from "ethers";
 import { IJobPostService, PublishJobPayload } from "./IJobPostService";
 import { injectable } from "tsyringe";
 import web3JobsJson from "../assets/web3Jobs.json";
 
-const CONTRACT_ADDRESS = "0x4D8Aef7882E6AaF221eFb7fA3649D069f7117Fc3"; // Jobs contract
+const CONTRACT_ADDRESS = "0x118a97555a8A3f8928576465fe38a37A4278D8a5"; // Jobs contract
 const CONTRACT_ABI = web3JobsJson.abi; // Jobs contract ABI
 
 @injectable()
@@ -60,5 +60,8 @@ export class JobPostService implements IJobPostService {
     const signedContract = this.jobsContract.connect(signer);
     const value = await signedContract.getMyJobs();
     return value;
+  }
+  async getAaveWethBalance() {
+    return await this.jobsContract.getAaveBalance();
   }
 }
