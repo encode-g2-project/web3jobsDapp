@@ -14,6 +14,7 @@ export default function JobPostings({ signer }) {
     const [jobPostings, setJobPostings] = useState([]);
     const [currentTab, setCurrentTab] = useState(0);
     const textilHelper = container.resolve(TextilHelper);
+    const [processing, setProcessing] = useState(false);
 
     const onSave = async (jobPost) => {
         try {
@@ -26,19 +27,56 @@ export default function JobPostings({ signer }) {
         setNewJobPost(false);
     }
 
-    useEffect(() => {
-        const getJobPosts = async () => {
-            try {
-                console.log('Loading jobs...');
-                const address = await signer.getAddress();
-                const result = await textilHelper.queryJobPostsByRecruiter(address);
-                setJobPostings(result.map((jobPost) => { return { ...jobPost, isPublished: jobPost.publishedId ? true : false, isClosed: false } }));
-            } catch (e) {
-                console.error(e);
-            }
+    const onPublish = async (jobPost) => {
+        try {
+            setProcessing(true);
+            const newJobPost = { ...jobPost };
+            //TODO call smart contract method tp publish and setup the publishedId
+            newJobPost.publishedId = "XXXXXXXX";
+            newJobPost.publishedAt = new Date().toISOString();
+            newJobPost.isPublished = true;
+            console.log('updating job post', newJobPost);
+            const result = await textilHelper.updateJobPost(newJobPost);
+            queryJobPosts();
+            setCurrentTab(1);
+        } catch (e) {
+            console.error(e);
         }
+        setProcessing(false);
+    }
 
-        if (textilHelper && signer) getJobPosts();
+    const onClose = async (jobPost) => {
+        try {
+            setProcessing(true);
+            const newJobPost = { ...jobPost };
+            //TODO call smart contract method tp publish and setup the publishedId
+            newJobPost.closedAt = new Date().toISOString();
+            newJobPost.isClosed = true;
+            newJobPost.isPublished = false;
+            console.log('updating job post', newJobPost);
+            const result = await textilHelper.updateJobPost(newJobPost);
+            queryJobPosts();
+            setCurrentTab(2);
+        } catch (e) {
+            console.error(e);
+        }
+        setProcessing(false);
+    }
+
+    const queryJobPosts = async () => {
+        try {
+            console.log('Loading jobs...');
+            const address = await signer.getAddress();
+            const result = await textilHelper.queryJobPostsByRecruiter(address);
+            setJobPostings(result);
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    useEffect(() => {
+
+        if (textilHelper && signer) queryJobPosts();
 
     }, []);
 
@@ -117,7 +155,7 @@ export default function JobPostings({ signer }) {
                                         scope="col"
                                         className="hidden px-3 py-3.5 text-center text-sm font-semibold text-gray-900 lg:table-cell"
                                     >
-                                        Created
+                                        {currentTab == 0 ? "Created" : currentTab == 1 ? "Published" : "Closed"}
                                     </th>
                                     <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
                                         <span className="sr-only">Publish</span>
@@ -126,8 +164,8 @@ export default function JobPostings({ signer }) {
                             </thead>
                             <tbody>
                                 {jobPostings.filter((element) => {
-                                    if (currentTab === 0) return !element.isPublished;
-                                    if (currentTab === 1) return element.isPublished;
+                                    if (currentTab === 0) return !element.isPublished && !element.isClosed;
+                                    if (currentTab === 1) return element.isPublished && !element.isClosed;
                                     if (currentTab === 2) return element.isClosed;
                                 }).map((jobPosition, jobIdx) => (
                                     <tr key={jobPosition._id}>
@@ -182,7 +220,7 @@ export default function JobPostings({ signer }) {
                                                 'hidden px-3 py-3.5 text-sm text-center text-gray-500 lg:table-cell'
                                             )}
                                         >
-                                            <Moment date={jobPosition.createdAt} fromNow={true} />
+                                            <Moment date={currentTab === 0 ? jobPosition.createdAt : currentTab === 1 ? jobPosition.publishedAt : jobPosition.closedAt} fromNow={true} />
                                         </td>
 
                                         <td
@@ -194,17 +232,21 @@ export default function JobPostings({ signer }) {
                                             {currentTab === 0 &&
                                                 <button
                                                     type="button"
+                                                    disabled={processing}
+                                                    onClick={() => onPublish(jobPosition)}
                                                     className="inline-flex items-center rounded-md border border-gray-300 bg-indigo-600 px-3 py-2 text-sm font-medium leading-4 text-white shadow-sm hover:bg-indigo-700 focus:outline-none disabled:cursor-not-allowed disabled:opacity-30"
                                                 >
-                                                    Publish<span className="sr-only"></span>
+                                                    {processing ? "Publishing..." : "Publish"}<span className="sr-only"></span>
                                                 </button>}
 
                                             {currentTab === 1 &&
                                                 <button
                                                     type="button"
+                                                    disabled={processing}
+                                                    onClick={() => onClose(jobPosition)}
                                                     className="inline-flex items-center rounded-md border border-gray-300 bg-indigo-600 px-3 py-2 text-sm font-medium leading-4 text-white shadow-sm hover:bg-indigo-700 focus:outline-none disabled:cursor-not-allowed disabled:opacity-30"
                                                 >
-                                                    Close<span className="sr-only"></span>
+                                                    {processing ? "Closing..." : "Close"}<span className="sr-only"></span>
                                                 </button>}
 
                                             {jobIdx !== 0 ? <div className="absolute right-6 left-0 -top-px h-px bg-gray-200" /> : null}

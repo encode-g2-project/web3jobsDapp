@@ -1,51 +1,36 @@
 import SearchBox from "../searchBox"
 import Moment from 'react-moment';
-
-const publishedJobs = [
-    {
-        _id: 1,
-        title: 'Frontend Developer',
-        description: 'We are looking for a Frontend Developer to join our team. You will be responsible for building the ‘client-side’ of our web applications. You should be able to translate our company and customer needs into functional and appealing interactive applications. If you’re also familiar with Agile methodologies and are passionate about the possibilities that the Web holds, we’d like to meet you. Ultimately, you will work with our team to create a unique user experience through our web applications.',
-        company: 'Aave',
-        publishedId: 'XXX123456',
-        createdAt: new Date(),
-        publishedAt: new Date(),
-        recruiterAddress: '0x123',
-        positionsToFill: 3,
-        bountyAmount: 10000
-    },
-    {
-        _id: 2,
-        title: 'Software Engineer',
-        description: 'We are looking for a Frontend Developer to join our team. You will be responsible for building the ‘client-side’ of our web applications. You should be able to translate our company and customer needs into functional and appealing interactive applications. If you’re also familiar with Agile methodologies and are passionate about the possibilities that the Web holds, we’d like to meet you. Ultimately, you will work with our team to create a unique user experience through our web applications.',
-        company: 'Encode Club',
-        publishedId: 'XXX12345d',
-        createdAt: new Date(),
-        publishedAt: new Date(),
-        recruiterAddress: '0x124',
-        positionsToFill: 5,
-        bountyAmount: 5000
-    },
-    {
-        _id: 3,
-        title: 'Project Manager',
-        description: 'We are looking for a Frontend Developer to join our team. You will be responsible for building the ‘client-side’ of our web applications. You should be able to translate our company and customer needs into functional and appealing interactive applications. If you’re also familiar with Agile methodologies and are passionate about the possibilities that the Web holds, we’d like to meet you. Ultimately, you will work with our team to create a unique user experience through our web applications.',
-        company: 'Miro',
-        publishedId: 'YYY12345d',
-        createdAt: new Date(),
-        publishedAt: new Date(),
-        recruiterAddress: '0x125',
-        positionsToFill: 1,
-        bountyAmount: 5000
-    },
-    // More plans...
-]
+import { container } from "tsyringe";
+import { TextilHelper } from "../../util/TextilHelper";
+import { useEffect, useState } from "react";
 
 function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
 }
 
 export default function Jobs({ signer }) {
+
+    const [publishedJobs, setPublishedJobs] = useState([]);
+    const textilHelper = container.resolve(TextilHelper);
+    const [processing, setProcessing] = useState(false);
+
+    const queryJobPosts = async () => {
+        try {
+            console.log('Loading jobs...');
+            const result = await textilHelper.queryAllPublishedJobPosts();
+            console.log('Loading jobs...', result);
+            setPublishedJobs(result);
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    useEffect(() => {
+
+        if (textilHelper) queryJobPosts();
+
+    }, []);
+
     return (
         <div className="px-4 py-6 sm:px-6 lg:px-8">
             <div className="sm:flex sm:items-center">

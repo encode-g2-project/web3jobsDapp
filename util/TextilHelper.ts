@@ -10,6 +10,63 @@ export class TextilHelper {
     key: "bzydtlz7debob74ohizoyxgh6dq",
   };
 
+  private jobPostingSchema = {
+    title: "JobPosting",
+    type: "object",
+    required: ["_id"],
+    properties: {
+      _id: {
+        type: "string",
+        description: "The instance's id.",
+      },
+      title: {
+        type: "string"
+      },
+      description: {
+        type: "string"
+      },
+      company: {
+        type: "string"
+      },
+      publishedId: {
+        type: "string"
+      },
+      recruiterAddress: {
+        type: "string"
+      },
+      location: {
+        type: "string"
+      },
+      salaryRange: {
+        type: "string"
+      },
+      positionsToFill: {
+        type: "integer",
+        minimum: 0,
+      },
+      bountyAmount: {
+        type: "number",
+        minimum: 0,
+      },
+      createdAt: {
+        type: "string",
+      },
+      publishedAt: {
+        type: "string"
+      },
+      closedAt: {
+        type: "string"
+      },
+      isClosed: {
+        type: "boolean"
+      },
+      isPublished: {
+        type: "boolean"
+      },
+    },
+  }
+
+
   private client: Client;
 
   //database identifier for web3jobsDatabase
@@ -49,66 +106,33 @@ export class TextilHelper {
     return thread;
   }
 
-  async createCollection(client: Client) {
+  async createCollection() {
+    const client = await this.getClient();
+    return await (client).newCollection(this.threadId, { name: 'jobPosting', schema: this.jobPostingSchema })
+  }
 
-    const jobPosting = {
-      title: "JobPosting",
-      type: "object",
-      required: ["_id"],
-      properties: {
-        _id: {
-          type: "string",
-          description: "The instance's id.",
-        },
-        title: {
-          type: "string"
-        },
-        description: {
-          type: "string"
-        },
-        company: {
-          type: "string"
-        },
-        publishedId: {
-          type: "string"
-        },
-        recruiterAddress: {
-          type: "string"
-        },
-        location: {
-          type: "string"
-        },
-        salaryRange: {
-          type: "string"
-        },
-        positionsToFill: {
-          type: "integer",
-          minimum: 0,
-        },
-        bountyAmount: {
-          type: "number",
-          minimum: 0,
-        },
-        createdAt: {
-          type: "string",
-        },
-        publishedAt: {
-          type: "string",
-          minimum: 0,
-        },
-      },
-    }
-
-    return await (client).newCollection(this.threadId, { name: 'jobPosting', schema: jobPosting })
+  async updateCollection() {
+    const client = await this.getClient();
+    return await (client).updateCollection(this.threadId, { name: 'jobPosting', schema: this.jobPostingSchema })
   }
 
   async createJobPost(jobPosting: any) {
     const client = await this.getClient();
     return await client.create(this.threadId, 'jobPosting', [jobPosting]);
   }
+  async updateJobPost(jobPosting: any) {
+    const client = await this.getClient();
+    return await client.save(this.threadId, 'jobPosting', [jobPosting]);
+  }
 
   async queryJobPostsByRecruiter (recruiterAddress: string) {
     const query = new Where('recruiterAddress').eq(recruiterAddress);
+    const client = await this.getClient();
+    return await client.find<any>(this.threadId, 'jobPosting', query)
+  }
+
+  async queryAllPublishedJobPosts () {
+    const query = new Where('isPublished').eq(true);
     const client = await this.getClient();
     return await client.find<any>(this.threadId, 'jobPosting', query)
   }

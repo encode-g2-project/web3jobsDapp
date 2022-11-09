@@ -18,6 +18,8 @@ export default function NewJobPost({ onCancel, onSave, signer }) {
             createdAt: new Date().toISOString(),
             positionsToFill: parseInt(event.target.positionsToFill.value),
             recruiterAddress: await signer.getAddress(),
+            isPublished: false,
+            isClosed: false,
         };
         setProcessing(true);
         await onSave(newJobPost);
