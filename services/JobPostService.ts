@@ -1,4 +1,4 @@
-import { BigNumber, ethers } from "ethers";
+import { BigNumber, ethers, providers } from "ethers";
 import { IJobPostService, PublishJobPayload } from "./IJobPostService";
 import { injectable } from "tsyringe";
 import { CONTRACT_ABI, CONTRACT_ADDRESS } from "./constants";
@@ -11,8 +11,7 @@ export class JobPostService implements IJobPostService {
   jobsSignedContract: ethers.Contract;
 
   constructor() {
-    this.provider = ethers.getDefaultProvider("goerli");
-
+    this.provider = new providers.EtherscanProvider("goerli", process.env.NEXT_PUBLIC_PROVIDER);
     this.jobsContract = new ethers.Contract(
       CONTRACT_ADDRESS,
       CONTRACT_ABI,

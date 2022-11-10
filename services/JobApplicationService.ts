@@ -1,4 +1,4 @@
-import { ethers } from "ethers";
+import { ethers, providers } from "ethers";
 import {
   ChangeApplicationStatus,
   IJobApplicationService,
@@ -14,7 +14,7 @@ export class JobApplicationService implements IJobApplicationService {
   jobsSignedContract: ethers.Contract;
 
   constructor() {
-    this.provider = ethers.getDefaultProvider("goerli");
+    this.provider = new providers.EtherscanProvider("goerli", process.env.NEXT_PUBLIC_PROVIDER);
 
     this.jobsContract = new ethers.Contract(
       CONTRACT_ADDRESS,
