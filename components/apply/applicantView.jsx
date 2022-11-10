@@ -18,7 +18,7 @@ export default function ApplicantView({ signer, jobApplicationServiceInstance, j
                 <a className="whitespace-nowrap text-sm text-indigo-600 hover:text-indigo-700 pr-4" href="#" onClick={toggleOption}> {searchOptionSelected ? "My Applications" : "Search"}</a>
             </div>
         </div>
-        <div className="h-96 rounded-lg border-2 border-gray-200" >
+        <div className="rounded-lg border-2 border-gray-200" >
             {searchOptionSelected ? <Jobs signer={signer} jobApplicationServiceInstance={jobApplicationServiceInstance} /> : <MyApplications signer={signer} jobApplicationServiceInstance={jobApplicationServiceInstance} />}
         </div>
     </div>)

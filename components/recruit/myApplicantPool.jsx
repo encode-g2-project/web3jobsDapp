@@ -56,11 +56,9 @@ export default function MyApplicantPool({ signer, jobApplicationServiceInstance 
                 applicantAddress: application.applicantAddress,
                 status: parseInt(newStatus)
             });
-            const newApplicantsList = [...applicants];
-            const index = newApplicantsList.findIndex(app => app._id === application._id);
-            newApplicantsList.splice(index, 1);
+            let newApplicantsList = [...applicants.filter(applicant => applicant._id === application._id)];
             const newApplication = { ...application, status: parseInt(newStatus) };
-            setApplicants([newApplication, ...applicants]);
+            setApplicants([newApplication, ...newApplicantsList]);
         } catch (e) {
             console.error(e);
         }

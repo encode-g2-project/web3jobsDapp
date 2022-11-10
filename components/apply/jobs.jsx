@@ -144,7 +144,7 @@ export default function Jobs({ signer, jobApplicationServiceInstance }) {
                                         'px-3 py-3.5 text-sm text-right text-gray-500'
                                     )}
                                 >
-                                    ${jobPosition.bountyAmount}
+                                    {jobPosition.bountyAmount?.toFixed(2)} <small>Ether</small>
                                 </td>
                                 <td
                                     className={classNames(

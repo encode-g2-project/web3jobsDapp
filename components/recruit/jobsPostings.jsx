@@ -226,7 +226,7 @@ export default function JobPostings({ signer, jobPostServiceInstance }) {
                                                     'hidden px-3 py-3.5 text-sm text-right text-gray-500 lg:table-cell'
                                                 )}
                                             >
-                                                {jobPosition.hired || 0}
+                                                {jobPosition.hired >= 0 ? jobPosition.hired : "..."}
                                             </td>
                                         }
                                         <td
@@ -235,7 +235,7 @@ export default function JobPostings({ signer, jobPostServiceInstance }) {
                                                 'px-3 py-3.5 text-sm text-right text-gray-500'
                                             )}
                                         >
-                                            ${jobPosition.bountyAmount}
+                                            {jobPosition.bountyAmount?.toFixed(2)} <small>Ether</small>
                                         </td>
                                         <td
                                             className={classNames(
