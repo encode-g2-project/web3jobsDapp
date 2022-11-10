@@ -75,9 +75,26 @@ export default function JobPostings({ signer, jobPostServiceInstance }) {
             const address = await signer.getAddress();
             const result = await textilHelper.queryJobPostsByRecruiter(address);
             setJobPostings(result);
+
+            let newList = result.map(jobPost => {
+                return { ...jobPost, hired: -1 };
+            });
+
+            for (let i = 0; i < newList.length; i++) {
+                let hired = 0;
+                try {
+                    hired = await jobPostServiceInstance.getHiredCount(newList[i].publishedId);
+                } catch (error) {
+                    console.log("Not found");
+                }
+                newList[i].hired = hired;
+            }
+            setJobPostings(newList);
+
         } catch (e) {
             console.error(e);
         }
+
     }
 
     useEffect(() => {

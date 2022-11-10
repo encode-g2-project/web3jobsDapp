@@ -12,6 +12,7 @@ export default function Home() {
 
   //get the service instance
   const jobApplicationServiceInstance = container.resolve(JobApplicationService);
+  const [contractLendingBalance, setContractLendingBalance] = useState(undefined);
   const jobPostServiceInstance = container.resolve(JobPostService);
   const [isConnected, setIsConnected] = useState(false);
   const [signer, setSigner] = useState(undefined);
@@ -60,10 +61,10 @@ export default function Home() {
           setProvider(provider);
           setSigner(provider.getSigner());
           setSignerAddress(await provider.getSigner().getAddress());
+          setContractLendingBalance(await jobPostServiceInstance.getAaveWethBalance());
         }
 
         ethereum.on('accountsChanged', onaAccountsChanged);
-
         ethereum.on('chainChanged', onChainChanged);
 
       } catch (e) {
@@ -105,8 +106,24 @@ export default function Home() {
             </div>}
             {!hasMetaMask && <div className="alert alert-danger" role="alert"> You need Metamask to use this app.</div>}
             {!isSupportedNetwork && <div className="alert alert-danger" role="alert"> Web3 jobs is currently in beta. Only available on Goerli Tesnet. Change your metamask network!</div>}
+            <footer className="bg-white">
+              <div className="mt-8 border-t border-gray-200 pt-8 md:flex md:items-center md:justify-between">
+                <div className="flex space-x-6 md:order-2">
+                  <div className="text-sm text-gray-500">
+                    <p className="text-base leading-6 text-indigo-400">
+                      Aave WETH Balance: <span className="text-base leading-6 text-gray-500">{`${contractLendingBalance} Ether` || "..."}</span>
+                    </p>
+                  </div>
+                </div>
+                <p className="mt-8 text-base text-gray-400 md:order-1 md:mt-0">
+                  &copy; 2022 Web3Jobs, Inc. All rights reserved.
+                </p>
+              </div>
+            </footer>
           </div>
+
         </main>
+
 
       </>
     </>

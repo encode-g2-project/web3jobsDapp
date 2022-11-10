@@ -22,7 +22,7 @@ export default function MyApplicantPool({ signer, jobApplicationServiceInstance 
             const result = await textilHelper.queryApplicantionsByRecruiter(await signer.getAddress());
             console.log('Loading applications...', result);
 
-            const newList = result.map(applicant => {
+            let newList = result.map(applicant => {
                 return { ...applicant, status: -1 };
             });
 
@@ -38,7 +38,7 @@ export default function MyApplicantPool({ signer, jobApplicationServiceInstance 
                 }
                 newList[i].status = status;
             }
-            setApplicants([...newList]);
+            setApplicants(newList);
 
         } catch (e) {
             console.error(e);

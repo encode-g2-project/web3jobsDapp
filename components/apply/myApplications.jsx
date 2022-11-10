@@ -20,21 +20,23 @@ export default function MyApplications({ signer, jobApplicationServiceInstance }
             //TODO call contract method myApplications to get statuses frok blockchain
             console.log('Loading applications...', result);
 
-            const newList = result.map(applicant => {
-                return { ...applicant, status: -1 };
+            let newList = result.map(applicant => {
+                return { ...applicant, status: -1, canClaim: false };
             });
 
             setMyApplications(newList);
 
             for (let i = 0; i < newList.length; i++) {
                 let status = ApplicationStatus.SCREENING;
+                let canClaim = false;
                 try {
                     status = await jobApplicationServiceInstance.getApplicants(newList[i].applicantAddress, newList[i].publishedId, 0);
-                    console.log('status', status);
+                    canClaim = await jobApplicationServiceInstance.canClaimBounty(newList[i].applicantAddress, newList[i].publishedId);
                 } catch (error) {
                     console.log("Not found");
                 }
                 newList[i].status = status;
+                newList[i].canClaim = canClaim;
             }
 
             setMyApplications([...newList]);
@@ -153,7 +155,7 @@ export default function MyApplications({ signer, jobApplicationServiceInstance }
                                             type="button"
                                             onClick={() => onClaim(application)}
                                             className="inline-flex items-center rounded-md border border-gray-300 bg-indigo-600 px-3 py-2 text-sm font-medium leading-4 text-white shadow-sm hover:bg-indigo-700 focus:outline-none disabled:cursor-not-allowed disabled:opacity-30"
-                                            disabled={application.status !== ApplicationStatus.REJECTED || processing === application._id}
+                                            disabled={application.canClaim !== true}
                                         >
                                             {application._id === processing ? "Claiming...." : "Claim"}<span className="sr-only"></span>
                                         </button>
