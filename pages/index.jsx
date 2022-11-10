@@ -15,6 +15,7 @@ export default function Home() {
   const jobPostServiceInstance = container.resolve(JobPostService);
   const [isConnected, setIsConnected] = useState(false);
   const [signer, setSigner] = useState(undefined);
+  const [signerAddress, setSignerAddress] = useState("");
   const [provider, setProvider] = useState(undefined);
   const [isSupportedNetwork, setIsSupportedNetwork] = useState(true);
   const [isOwner, setIsOwner] = useState(false);
@@ -58,6 +59,7 @@ export default function Home() {
           setIsConnected(true);
           setProvider(provider);
           setSigner(provider.getSigner());
+          setSignerAddress(await provider.getSigner().getAddress());
         }
 
         ethereum.on('accountsChanged', onaAccountsChanged);
@@ -73,7 +75,7 @@ export default function Home() {
   }
 
   useEffect(() => {
-
+    connect();
     return () => {
       ethereum.removeListener('accountsChanged', onaAccountsChanged);
       ethereum.removeListener('chainChanged', onChainChanged);
@@ -92,7 +94,7 @@ export default function Home() {
         <link rel="icon" href="/favicon-32x32.png" />
       </Head>
       <>
-        <Header onChangeOption={onChangeOption} onConnect={connect} signer={signer} isConnected={isConnected} />
+        <Header onChangeOption={onChangeOption} onConnect={connect} connectedAddress={signerAddress} isConnected={isConnected} />
         <main className="pt-20">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             {/* We've used 3xl here, but feel free to try other max-widths based on your needs */}

@@ -1,7 +1,7 @@
 import SearchBox from "../searchBox"
 import Moment from 'react-moment';
 import { container } from "tsyringe";
-import { TextilHelper } from "../../util/TextilHelper";
+import { TextilHelper } from "../../repositories/TextilHelper";
 import { useEffect, useState } from "react";
 import uuid from 'react-uuid';
 

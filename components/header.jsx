@@ -55,7 +55,7 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
-export default function Header({ onChangeOption, onConnect, signer, isConnected }) {
+export default function Header({ onChangeOption, onConnect, isConnected, connectedAddress }) {
   return (
     <Popover className="relative bg-white">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
@@ -203,9 +203,9 @@ export default function Header({ onChangeOption, onConnect, signer, isConnected 
             <a
               href="#"
               onClick={e => { e.preventDefault(); onConnect(); }}
-              className="ml-8 inline-flex items-center justify-center whitespace-nowrap rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-indigo-700"
+              className="ml-8 inline-flex items-center justify-center whitespace-nowrap rounded-md border border-transparent bg-pink-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-indigo-700"
             >
-              {isConnected ? "Connected" : "Connect"}
+              {isConnected ? `Connected ...${connectedAddress.substring(connectedAddress.length - 4, connectedAddress.length)}` : "Connect"}
             </a>
           </div>
         </div>

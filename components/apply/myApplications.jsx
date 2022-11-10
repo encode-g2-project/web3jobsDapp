@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import Moment from 'react-moment';
 import { container } from "tsyringe";
-import { TextilHelper } from "../../util/TextilHelper";
+import { TextilHelper } from "../../repositories/TextilHelper";
 import { ApplicationStatus } from "../../services/IJobApplicationService"
 
 function classNames(...classes) {
@@ -139,7 +139,7 @@ export default function MyApplications({ signer, jobApplicationServiceInstance }
                                         )}
                                     >
                                         <span className="inline-flex rounded-full bg-blue-100 px-2 text-xs font-semibold leading-5 text-blue-800">
-                                            {application.status}
+                                            {ApplicationStatus[application.status]?.toString().replace("_", " ") || "LOADING..."}
                                         </span>
 
                                     </td>

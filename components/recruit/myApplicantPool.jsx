@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import Moment from 'react-moment';
 import { container } from "tsyringe";
-import { TextilHelper } from "../../util/TextilHelper";
+import { TextilHelper } from "../../repositories/TextilHelper";
 import { ApplicationStatus } from "../../services/IJobApplicationService"
 
 function classNames(...classes) {
@@ -11,8 +11,10 @@ function classNames(...classes) {
 export default function MyApplicantPool({ signer, jobApplicationServiceInstance }) {
 
     const [applicants, setApplicants] = useState([]);
-    const [processing, setProcessing] = useState(undefined)
+    const [processing, setProcessing] = useState(undefined);
+    const [loadingStatuses, setLoadingStatuses] = useState(false);
     const textilHelper = container.resolve(TextilHelper);
+    const [currentTab, setCurrentTab] = useState(-1);
 
     const queryMyApplicants = async () => {
         try {
@@ -25,7 +27,7 @@ export default function MyApplicantPool({ signer, jobApplicationServiceInstance 
             });
 
             setApplicants(newList);
-
+            setLoadingStatuses(true);
             for (let i = 0; i < newList.length; i++) {
                 let status = ApplicationStatus.SCREENING;
                 try {
@@ -36,26 +38,29 @@ export default function MyApplicantPool({ signer, jobApplicationServiceInstance 
                 }
                 newList[i].status = status;
             }
-
             setApplicants([...newList]);
 
         } catch (e) {
             console.error(e);
         }
+
+        setLoadingStatuses(false);
     }
 
     const onChangStatus = async (application, newStatus) => {
         try {
             console.log(application);
             setProcessing(application._id);
-
             await jobApplicationServiceInstance.changeApplicationStatus(signer, {
                 jobId: application.publishedId,
                 applicantAddress: application.applicantAddress,
                 status: parseInt(newStatus)
             });
-
-            queryMyApplicants();
+            const newApplicantsList = [...applicants];
+            const index = newApplicantsList.findIndex(app => app._id === application._id);
+            newApplicantsList.splice(index, 1);
+            const newApplication = { ...application, status: parseInt(newStatus) };
+            setApplicants([newApplication, ...applicants]);
         } catch (e) {
             console.error(e);
         }
@@ -76,37 +81,60 @@ export default function MyApplicantPool({ signer, jobApplicationServiceInstance 
                         <span className="isolate inline-flex rounded-md shadow-sm">
                             <button
                                 type="button"
-                                className="relative inline-flex items-center rounded-l-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:z-10 focus:bg-gray-600 focus:text-white focus:outline-none"
+                                onClick={() => setCurrentTab(-1)}
+                                className={currentTab !== -1 ? "relative inline-flex items-center rounded-l-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:z-10 focus:bg-gray-600 focus:text-white focus:outline-none" :
+                                    "relative inline-flex items-center rounded-l-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium z-10 bg-gray-600 text-white outline-none"}
+                            >
+                                All
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setCurrentTab(0)}
+                                disabled={loadingStatuses}
+                                className={currentTab !== 0 ? "relative -ml-px inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:z-10 focus:bg-gray-600 focus:text-white focus:outline-none" :
+                                    "relative -ml-px inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium z-10 bg-gray-600 text-white outline-none"}
                             >
                                 Screening
                             </button>
                             <button
                                 type="button"
-                                className="relative -ml-px inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:z-10 focus:bg-gray-600 focus:text-white focus:outline-none"
+                                disabled={loadingStatuses}
+                                onClick={() => setCurrentTab(1)}
+                                className={currentTab !== 1 ? "relative -ml-px inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:z-10 focus:bg-gray-600 focus:text-white focus:outline-none" :
+                                    "relative -ml-px inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium z-10 bg-gray-600 text-white outline-none"}
                             >
                                 Interview
                             </button>
                             <button
                                 type="button"
-                                className="relative -ml-px inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:z-10 focus:bg-gray-600 focus:text-white focus:outline-none"
-                            >
+                                onClick={() => setCurrentTab(2)}
+                                disabled={loadingStatuses}
+                                className={currentTab !== 2 ? "relative -ml-px inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:z-10 focus:bg-gray-600 focus:text-white focus:outline-none" :
+                                    "relative -ml-px inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium z-10 bg-gray-600 text-white outline-none"}>
                                 Assessment
                             </button>
                             <button
                                 type="button"
-                                className="relative -ml-px inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:z-10 focus:bg-gray-600 focus:text-white focus:outline-none"
-                            >
+                                onClick={() => setCurrentTab(3)}
+                                disabled={loadingStatuses}
+                                className={currentTab !== 3 ? "relative -ml-px inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:z-10 focus:bg-gray-600 focus:text-white focus:outline-none" :
+                                    "relative -ml-px inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium z-10 bg-gray-600 text-white outline-none"}>
                                 Final Interview
                             </button>
                             <button
                                 type="button"
-                                className="relative -ml-px inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:z-10 focus:bg-gray-600 focus:text-white focus:outline-none"
-                            >
+                                onClick={() => setCurrentTab(4)}
+                                disabled={loadingStatuses}
+                                className={currentTab !== 4 ? "relative -ml-px inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:z-10 focus:bg-gray-600 focus:text-white focus:outline-none" :
+                                    "relative -ml-px inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium z-10 bg-gray-600 text-white outline-none"}>
                                 Hired
                             </button>
                             <button
                                 type="button"
-                                className="relative -ml-px inline-flex items-center rounded-r-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:z-10 focus:bg-gray-600 focus:text-white focus:outline-none"
+                                onClick={() => setCurrentTab(5)}
+                                disabled={loadingStatuses}
+                                className={currentTab !== 5 ? "relative -ml-px inline-flex items-center rounded-r-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:z-10 focus:bg-gray-600 focus:text-white focus:outline-none" :
+                                    "relative -ml-px inline-flex items-center rounded-r-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium z-10 bg-gray-600 text-white outline-none"}
                             >
                                 Rejected
                             </button>
@@ -141,7 +169,7 @@ export default function MyApplicantPool({ signer, jobApplicationServiceInstance 
                             </tr>
                         </thead>
                         <tbody>
-                            {applicants.map((applicant, applicantIdx) => (
+                            {applicants.filter(element => currentTab === -1 || element.status === currentTab).map((applicant, applicantIdx) => (
                                 <tr key={`${applicantIdx}_${applicant._id}`}>
                                     <td
                                         className={classNames(
@@ -174,24 +202,24 @@ export default function MyApplicantPool({ signer, jobApplicationServiceInstance 
                                     <td
                                         className={classNames(
                                             applicantIdx === 0 ? '' : 'border-t border-transparent',
-                                            'relative py-3.5 pl-3 pr-4 sm:pr-6 text-right text-sm font-medium'
+                                            'relative py-3.5 pl-3 pr-4 sm:pr-6 text-center text-sm font-medium'
                                         )}
                                     >
-                                        {applicant.status === -1 ? <span>Loading...</span> : processing === applicant._id ? <span>Processing...</span> :
+                                        {applicant.status === -1 ? <span>Loading...</span> : processing === applicant._id ? <span>Updating...</span> :
                                             <select
                                                 id="location"
                                                 name="location"
-                                                className="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+                                                className="mt-1 block w-full text-center rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
                                                 defaultValue={applicant.status}
                                                 disabled={processing === applicant._id}
                                                 onChange={e => onChangStatus(applicant, e.target.value)}
                                             >
-                                                <option value={ApplicationStatus.SCREENING}>Screening</option>
-                                                <option value={ApplicationStatus.FIRST_INTERVIEW}>Interview</option>
-                                                <option value={ApplicationStatus.TECHNICAL_TEST}>Assessment</option>
-                                                <option value={ApplicationStatus.FINAL_INTERVIEW}>F. Interview</option>
-                                                <option value={ApplicationStatus.HIRED}>Hired</option>
-                                                <option value={ApplicationStatus.REJECTED}>Rejected</option>
+                                                <option value={ApplicationStatus.SCREENING}>SCREENING</option>
+                                                <option value={ApplicationStatus.FIRST_INTERVIEW}>FIRST INTERVIEW</option>
+                                                <option value={ApplicationStatus.TECHNICAL_TEST}>TECHNICAL TEST</option>
+                                                <option value={ApplicationStatus.FINAL_INTERVIEW}>FINAL INTERVIEW</option>
+                                                <option value={ApplicationStatus.HIRED}>HIRED</option>
+                                                <option value={ApplicationStatus.REJECTED}>REJECTED</option>
                                             </select>}
                                         {applicantIdx !== 0 ? <div className="absolute right-6 left-0 -top-px h-px bg-gray-200" /> : null}
                                     </td>

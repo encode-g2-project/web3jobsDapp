@@ -7,7 +7,7 @@ import { injectable } from "tsyringe";
 export class TextilHelper {
 
   private key: KeyInfo = {
-    key: "bzydtlz7debob74ohizoyxgh6dq",
+    key: process.env.NEXT_PUBLIC_TEXTILE
   };
 
   private jobPostingSchema = {

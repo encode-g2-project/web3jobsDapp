@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import Moment from 'react-moment';
 import NewJobPost from './newJobPost';
 import { container } from "tsyringe";
-import { TextilHelper } from "../../util/TextilHelper";
+import { TextilHelper } from "../../repositories/TextilHelper";
 
 function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
@@ -12,7 +12,7 @@ export default function JobPostings({ signer, jobPostServiceInstance }) {
 
     const [newJobPost, setNewJobPost] = useState(false);
     const [jobPostings, setJobPostings] = useState([]);
-    const [currentTab, setCurrentTab] = useState(0);
+    const [currentTab, setCurrentTab] = useState(1);
     const textilHelper = container.resolve(TextilHelper);
     const [processing, setProcessing] = useState(false);
 
