@@ -26,17 +26,17 @@ export default function MyApplications({ signer, jobApplicationServiceInstance }
 
             setMyApplications(newList);
 
-            for (let i = 0; i < newList.length; i++) {
+            for (const element of newList) {
                 let status = ApplicationStatus.SCREENING;
                 let canClaim = false;
                 try {
-                    status = await jobApplicationServiceInstance.getApplicants(newList[i].applicantAddress, newList[i].publishedId, 0);
-                    canClaim = await jobApplicationServiceInstance.canClaimBounty(newList[i].applicantAddress, newList[i].publishedId);
+                    status = await jobApplicationServiceInstance.getApplicants(element.applicantAddress, element.publishedId, 0);
+                    canClaim = await jobApplicationServiceInstance.canClaimBounty(element.applicantAddress, element.publishedId);
                 } catch (error) {
                     console.log("Not found");
                 }
-                newList[i].status = status;
-                newList[i].canClaim = canClaim;
+                element.status = status;
+                element.canClaim = canClaim;
             }
 
             setMyApplications([...newList]);
@@ -99,8 +99,8 @@ export default function MyApplications({ signer, jobApplicationServiceInstance }
                                 <th scope="col" className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900">
                                     Status
                                 </th>
-                                <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
-                                    <span className="sr-only">Bounty</span>
+                                <th scope="col" className="relative py-3.5 px-3 pr-4 sm:pr-6 text-center text-sm font-semibold text-gray-900">
+                                    Bounty
                                 </th>
                             </tr>
                         </thead>
@@ -148,7 +148,7 @@ export default function MyApplications({ signer, jobApplicationServiceInstance }
                                     <td
                                         className={classNames(
                                             applicationIdx === 0 ? '' : 'border-t border-transparent',
-                                            'relative py-3.5 pl-3 pr-4 sm:pr-6 text-right text-sm font-medium'
+                                            'relative py-3.5 pl-3 pr-4 sm:pr-6 text-center text-sm font-medium'
                                         )}
                                     >
                                         <button
